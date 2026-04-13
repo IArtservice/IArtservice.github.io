@@ -7,9 +7,32 @@
     <link rel="icon" type="image/jpeg" href="logo iart.jpeg">
     
     <title>IArtservice | Soluzioni Digitali e Problem Solving Universale</title>
-    <meta name="description" content="IArtservice risolve ogni tua esigenza digitale: QR Code dinamici, siti web professionali, potenziamento social e consulenza informatica su misura per privati e aziende di ogni settore.">
-    <meta name="keywords" content="Problem Solving Digitale, QR Code Dinamici, Creazione Siti Web, Assistenza Informatica, Consulenza Aziendale, Menu Digitali, Recensioni Google, IArtservice, Digitalizzazione">
+    <meta name="description" content="IArtservice risolve la tua esigenza digitale: QR Code dinamici, siti web professionali, potenziamento social e consulenza IT su misura per privati e aziende.">
+    <meta name="keywords" content="Problem Solving Digitale, QR Code Dinamici, Creazione Siti Web, Assistenza Informatica, Consulenza Aziendale, Digitalizzazione, IArtservice">
     <meta name="author" content="IArtservice">
+
+    <meta property="og:title" content="IArtservice | Soluzioni Digitali e Problem Solving">
+    <meta property="og:description" content="Dal QR Code per la ristorazione alla creazione di siti web complessi. Innovazione senza confini per privati e aziende.">
+    <meta property="og:image" content="https://www.iartservice.com/logo%20iart.jpeg">
+    <meta property="og:url" content="https://www.iartservice.com">
+    <meta property="og:type" content="website">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "IArtservice",
+      "image": "https://www.iartservice.com/logo%20iart.jpeg",
+      "description": "Soluzioni digitali intelligenti e problem solving informatico per privati e aziende di ogni settore.",
+      "url": "https://www.iartservice.com",
+      "telephone": "+393331395730",
+      "email": "iartservizi@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IT"
+      }
+    }
+    </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -58,8 +81,8 @@
 
         /* Sezione Universale */
         .about { padding: 80px 10%; text-align: center; background: #f9f9f9; }
-        .about h2 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; margin-bottom: 20px; }
-        .about p { font-size: 1.2rem; color: #555; max-width: 800px; margin: 0 auto; }
+        .about h2 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; margin-bottom: 20px; color: var(--primary); }
+        .about p { font-size: 1.2rem; color: #555; max-width: 800px; margin: 0 auto; line-height: 1.8; }
 
         /* Grid Servizi */
         .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 60px 10%; }
@@ -69,9 +92,10 @@
         }
         .s-card:hover { border-bottom: 5px solid var(--primary); transform: scale(1.03); }
         .s-card i { font-size: 3rem; color: var(--primary); margin-bottom: 20px; }
-        .s-card h3 { margin-bottom: 15px; font-size: 1.5rem; }
+        .s-card h3 { margin-bottom: 15px; font-size: 1.5rem; color: var(--dark); }
 
         footer { background: var(--dark); color: white; padding: 40px; text-align: center; }
+        footer p { margin-bottom: 10px; }
 
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
@@ -81,47 +105,49 @@
 </head>
 <body>
 
-    <section class="hero">
-        <img src="logo iart.jpeg" alt="IArtservice Logo" class="logo-img">
-        <h1>IArtservice</h1>
-        <p>Non vendiamo solo servizi, risolviamo problemi. <br>Soluzioni intelligenti per Privati, Professionisti e Aziende di ogni settore.</p>
-        
-        <div class="cta-container">
-            <a href="https://wa.me/393331395730" class="btn btn-wa">
-                <i class="fab fa-whatsapp"></i> WhatsApp 
-            </a>
-            <a href="mailto:iartservizi@gmail.com" class="btn btn-mail">
-                <i class="fas fa-envelope"></i> Scrivici Email
-            </a>
-        </div>
-    </section>
+    <main>
+        <section class="hero">
+            <img src="logo iart.jpeg" alt="Logo IArtservice - Soluzioni Digitali e Problem Solving" class="logo-img">
+            <h1>IArtservice</h1>
+            <p>Non vendiamo solo servizi, risolviamo problemi. <br>Soluzioni intelligenti per Privati, Professionisti e Aziende di ogni settore.</p>
+            
+            <div class="cta-container">
+                <a href="https://wa.me/393331395730" class="btn btn-wa">
+                    <i class="fab fa-whatsapp"></i> WhatsApp 
+                </a>
+                <a href="mailto:iartservizi@gmail.com" class="btn btn-mail">
+                    <i class="fas fa-envelope"></i> Scrivici Email
+                </a>
+            </div>
+        </section>
 
-    <section class="about">
-        <h2>Oltre la Tecnologia: Il tuo Partner Strategico</h2>
-        <p>Siamo nati supportando la ristorazione, ma la nostra missione è universale. Qualunque sia il tuo ostacolo digitale o la tua necessità di crescita aziendale o privata, noi costruiamo la chiave per risolverlo.</p>
-    </section>
+        <section class="about">
+            <h2>Il tuo Partner Strategico per il Digitale</h2>
+            <p>Siamo nati supportando la ristorazione, ma la nostra missione è universale. Qualunque sia il tuo ostacolo informatico o la tua necessità di crescita aziendale o privata, noi costruiamo la chiave su misura per risolverlo. Diamo vita alle tue idee unendo tecnologia e creatività.</p>
+        </section>
 
-    <section class="services">
-        <div class="s-card">
-            <i class="fas fa-rocket"></i>
-            <h3>Digitalizzazione 360°</h3>
-            <p>Dalla creazione di siti web moderni all'automazione di processi per privati e aziende di ogni tipo.</p>
-        </div>
-        <div class="s-card">
-            <i class="fas fa-qrcode"></i>
-            <h3>Smart QR Solutions</h3>
-            <p>QR dinamici intelligenti: menu digitali, gestione recensioni Google e crescita follower Instagram immediata.</p>
-        </div>
-        <div class="s-card">
-            <i class="fas fa-brain"></i>
-            <h3>Problem Solving IT</h3>
-            <p>Hai una sfida tecnologica? Risolviamo problemi tecnici e logistici complessi con soluzioni innovative e rapide.</p>
-        </div>
-    </section>
+        <section class="services">
+            <div class="s-card">
+                <i class="fas fa-rocket"></i>
+                <h3>Digitalizzazione 360°</h3>
+                <p>Dalla creazione di siti web moderni all'automazione di processi operativi per privati e aziende di ogni tipo.</p>
+            </div>
+            <div class="s-card">
+                <i class="fas fa-qrcode"></i>
+                <h3>Smart QR Solutions</h3>
+                <p>QR dinamici intelligenti: menu digitali, gestione rapida delle recensioni Google e crescita follower immediata.</p>
+            </div>
+            <div class="s-card">
+                <i class="fas fa-brain"></i>
+                <h3>Problem Solving IT</h3>
+                <p>Hai una sfida tecnologica? Risolviamo problemi tecnici e logistici complessi con soluzioni innovative, rapide e concrete.</p>
+            </div>
+        </section>
+    </main>
 
     <footer>
         <p><strong>IArtservice</strong> - Innovazione senza confini</p>
-        <p>Cell: +39 333 139 5730 | Email: iartservizi@gmail.com</p>
+        <p><i class="fas fa-phone"></i> +39 333 139 5730 | <i class="fas fa-envelope"></i> iartservizi@gmail.com</p>
         <p style="margin-top:20px; font-size: 0.8rem; opacity: 0.6;">© 2026 www.iartservice.com | Tutti i diritti riservati.</p>
     </footer>
 
