@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>IArtservice | Soluzioni Digitali e Problem Solving per Aziende e Privati</title>
+    <meta name="description" content="IArtservice risolve ogni tua esigenza digitale. Dal QR Code dinamico per la ristorazione alla creazione di siti web, potenziamento social e consulenza informatica per ogni settore.">
+    <meta name="keywords" content="Problem Solving Digitale, QR Code Dinamici, Creazione Siti Web, Assistenza Informatica, Consulenza Aziendale, Menu Digitali, Recensioni Google, IArtservice">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #d4af37; /* Colore per un tocco luxury/professionale */
+            --primary: #1a237e;
+            --accent: #00c853;
+            --dark: #0a0a0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #fff; color: #333; overflow-x: hidden; }
+
+        /* Effetto Wow Hero */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .logo-img { max-width: 250px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+        
+        h1 { font-family: 'Montserrat', sans-serif; font-size: 4rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+        .hero p { font-size: 1.5rem; max-width: 900px; margin-bottom: 30px; font-weight: 300; }
+
+        /* Pulsanti Wow */
+        .cta-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .btn { 
+            padding: 18px 40px; border-radius: 50px; text-decoration: none; font-weight: 700; 
+            text-transform: uppercase; transition: all 0.4s ease; display: flex; align-items: center; gap: 10px;
+            font-size: 1.1rem;
+        }
+        .btn-wa { background-color: var(--accent); color: white; box-shadow: 0 10px 20px rgba(0,200,83,0.3); }
+        .btn-mail { background-color: white; color: var(--dark); box-shadow: 0 10px 20px rgba(255,255,255,0.2); }
+        .btn:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+
+        /* Sezione Universale */
+        .about { padding: 80px 10%; text-align: center; background: #f9f9f9; }
+        .about h2 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; margin-bottom: 20px; }
+        .about p { font-size: 1.2rem; color: #555; max-width: 800px; margin: 0 auto; }
+
+        /* Grid Servizi */
+        .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 60px 10%; }
+        .s-card { 
+            padding: 40px; background: white; border-radius: 15px; text-align: center;
+            transition: 0.3s; border-bottom: 5px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .s-card:hover { border-bottom: 5px solid var(--primary); transform: scale(1.03); }
+        .s-card i { font-size: 3rem; color: var(--primary); margin-bottom: 20px; }
+        .s-card h3 { margin-bottom: 15px; font-size: 1.5rem; }
+
+        footer { background: var(--dark); color: white; padding: 40px; text-align: center; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <img src="logo iart.jpeg" alt="IArtservice Logo" class="logo-img">
+        <h1>IArtservice</h1>
+        <p>Non vendiamo solo servizi, risolviamo problemi. <br>Soluzioni intelligenti per Privati, Professionisti e Aziende di ogni settore.</p>
+        
+        <div class="cta-container">
+            <a href="https://wa.me/393331395730" class="btn btn-wa">
+                <i class="fab fa-whatsapp"></i> WhatsApp 
+            </a>
+            <a href="mailto:iartservizi@gmail.com" class="btn btn-mail">
+                <i class="fas fa-envelope"></i> Scrivici Email
+            </a>
+        </div>
+    </section>
+
+    <section class="about">
+        <h2>Oltre la Tecnologia: Il tuo Partner Strategico</h2>
+        <p>Siamo nati supportando la ristorazione, ma la nostra missione è universale. Qualunque sia il tuo ostacolo digitale o la tua necessità di crescita, noi costruiamo la chiave per risolverlo.</p>
+    </section>
+
+    <section class="services">
+        <div class="s-card">
+            <i class="fas fa-rocket"></i>
+            <h3>Digitalizzazione 360°</h3>
+            <p>Dalla creazione di siti web moderni all'automazione di processi per privati e aziende.</p>
+        </div>
+        <div class="s-card">
+            <i class="fas fa-qrcode"></i>
+            <h3>Smart QR Solutions</h3>
+            <p>Non solo menu. QR dinamici per recensioni Google, follower Instagram e interazione immediata con i clienti.</p>
+        </div>
+        <div class="s-card">
+            <i class="fas fa-brain"></i>
+            <h3>Problem Solving IT</h3>
+            <p>Hai un problema tecnico o un'idea che non sai come realizzare? Ci pensiamo noi, con soluzioni su misura.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>IArtservice</strong> - Innovazione senza confini</p>
+        <p>Cell: +39 333 139 5730 | Email: iartservizi@gmail.com</p>
+        <p style="margin-top:20px; font-size: 0.8rem; opacity: 0.6;">© 2026 www.iartservice.com | Tutti i diritti riservati.</p>
+    </footer>
+
+</body>
+</html>
