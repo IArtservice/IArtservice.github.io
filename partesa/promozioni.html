@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Promozioni del Mese</title>
+    <meta http-equiv="refresh" content="0; URL='volantino.pdf'">
+</head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <h2>Apertura promozioni...</h2>
+    <p>Se non visualizzi il file, <a href="volantino.pdf">clicca qui per aprirlo</a>.</p>
+
+    <script>
+        // Aggiunge un numero univoco basato sull'orario per forzare il download del nuovo file
+        window.location.href = "volantino.pdf?v=" + Date.now();
+    </script>
+</body>
+</html>
