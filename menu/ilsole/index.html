@@ -37,69 +37,80 @@
             position: relative;
         }
 
-        /* HERO CON ANIMAZIONE WOW MIGLIORATA */
+        /* HERO CON EFFETTO WOW MOLTO PIÙ EVIDENTE */
         .hero {
             background: linear-gradient(145deg, #ff8c1a 0%, #ffcc33 100%);
-            padding: 1.5rem 1rem 1.2rem;  /* padding invariato */
+            padding: 1.5rem 1rem 1.2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
         
-        /* Nuovo effetto: luce pulsante che si muove diagonalmente */
+        /* Raggio di sole che ruota */
         .hero::before {
             content: '';
             position: absolute;
-            top: -30%;
-            left: -30%;
-            width: 160%;
-            height: 160%;
-            background: radial-gradient(circle, rgba(255, 255, 200, 0.6) 0%, rgba(255, 140, 26, 0) 70%);
-            animation: heroShine 8s ease-in-out infinite;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 30px,
+                rgba(255, 255, 200, 0.25) 30px,
+                rgba(255, 255, 200, 0.25) 60px
+            );
+            animation: sunBeam 20s linear infinite;
             pointer-events: none;
         }
         
-        @keyframes heroShine {
-            0% {
-                transform: translate(-10%, -10%) scale(0.8);
-                opacity: 0.4;
-            }
-            50% {
-                transform: translate(10%, 10%) scale(1.2);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translate(-10%, -10%) scale(0.8);
-                opacity: 0.4;
-            }
+        @keyframes sunBeam {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        /* Secondo strato per un effetto ancora più dinamico */
+        /* Bagliore pulsante centrale */
         .hero::after {
             content: '';
             position: absolute;
-            bottom: -20%;
-            right: -20%;
-            width: 140%;
-            height: 140%;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            transform: translate(-50%, -50%);
             background: radial-gradient(circle, rgba(255, 255, 200, 0.4) 0%, rgba(255, 140, 26, 0) 70%);
-            animation: heroShineReverse 10s ease-in-out infinite;
+            animation: centralGlow 3s ease-in-out infinite alternate;
             pointer-events: none;
         }
         
-        @keyframes heroShineReverse {
+        @keyframes centralGlow {
             0% {
-                transform: translate(10%, 10%) scale(0.9);
                 opacity: 0.3;
-            }
-            50% {
-                transform: translate(-10%, -10%) scale(1.3);
-                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(0.8);
             }
             100% {
-                transform: translate(10%, 10%) scale(0.9);
-                opacity: 0.3;
+                opacity: 0.9;
+                transform: translate(-50%, -50%) scale(1.2);
             }
+        }
+        
+        /* Luce che si muove in diagonale */
+        .hero .shine {
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(25deg);
+            animation: diagonalShine 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes diagonalShine {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
         }
 
         .logo-area {
@@ -109,7 +120,6 @@
             justify-content: center;
         }
 
-        /* Logo ingrandito a 280px */
         .main-logo {
             max-width: 280px;
             width: 100%;
@@ -379,6 +389,7 @@
 
 <div class="menu-wrapper">
     <div class="hero">
+        <div class="shine"></div> <!-- elemento per l'effetto diagonale -->
         <div class="logo-area">
             <img src="logoilsole.png" alt="Il Sole Logo" class="main-logo">
         </div>
@@ -390,8 +401,8 @@
         <button class="filter-btn" data-cat="dolci"><i class="fas fa-cookie-bite"></i> Dolce</button>
         <button class="filter-btn" data-cat="salati"><i class="fas fa-cheese"></i> Salato</button>
         <button class="filter-btn" data-cat="pranzo"><i class="fas fa-utensils"></i> Pranzo</button>
-        <!-- Icona Bevande corretta: fa-glass-water -->
-        <button class="filter-btn" data-cat="bevande"><i class="fas fa-glass-water"></i> Bevande</button>
+        <!-- Icona Bevande: fa-bottle-water (bottiglia) funzionante -->
+        <button class="filter-btn" data-cat="bevande"><i class="fas fa-bottle-water"></i> Bevande</button>
         <button class="filter-btn" data-cat="cocktail"><i class="fas fa-cocktail"></i> Cocktail</button>
         <button class="filter-btn" data-cat="viniSpritz"><i class="fas fa-wine-glass-alt"></i> Spritz & Vini</button>
         <button class="filter-btn" data-cat="birre"><i class="fas fa-beer"></i> Birre</button>
@@ -508,7 +519,7 @@
         dolci: "fa-cookie-bite",
         salati: "fa-cheese",
         pranzo: "fa-utensils",
-        bevande: "fa-glass-water",   // Icona corretta e visibile
+        bevande: "fa-bottle-water",   // Icona corretta e visibile
         cocktail: "fa-cocktail",
         viniSpritz: "fa-wine-glass-alt",
         birre: "fa-beer",
@@ -519,7 +530,7 @@
         dolci: "Dolce & Pasticceria",
         salati: "Salato & Focacce",
         pranzo: "Pranzo",
-        bevande: "Bevande analcoliche",
+        bevande: "Bevande",            // Cambiato da "Bevande analcoliche" a "Bevande"
         cocktail: "Cocktail",
         viniSpritz: "Spritz, Vino & Spirit",
         birre: "Birre artigianali",
