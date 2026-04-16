@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -15,14 +15,16 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: #fef3e0;
+            background: #f0e0c8;  /* Sfondo più scuro per aumentare il contrasto con le card bianche */
             font-family: 'Outfit', sans-serif;
             color: #2c1e12;
             padding: 0;
             min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .menu-wrapper {
@@ -32,15 +34,17 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.05);
             border-radius: 0 0 28px 28px;
             overflow: hidden;
+            position: relative;
         }
 
         .hero {
             background: linear-gradient(145deg, #ff8c1a 0%, #ffcc33 100%);
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 1rem 1.2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
+        
         .hero::after {
             content: '';
             position: absolute;
@@ -48,8 +52,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,200,0.4) 0%, rgba(255,140,26,0) 70%);
-            animation: rotateGlow 15s linear infinite;
+            background: radial-gradient(circle, rgba(255,255,200,0.5) 0%, rgba(255,140,26,0) 70%);
+            animation: rotateGlow 12s linear infinite;
         }
         @keyframes rotateGlow {
             0% { transform: rotate(0deg); }
@@ -64,54 +68,64 @@
         }
 
         .main-logo {
-            max-width: 190px;
+            max-width: 170px;
             width: 100%;
             height: auto;
-            filter: drop-shadow(0 6px 14px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+            animation: floatLogo 6s ease-in-out infinite;
+        }
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .filter-bar {
-            padding: 0.8rem;
+            padding: 0.7rem 1rem;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.6rem;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            align-items: center;
+            gap: 0.7rem;
             position: sticky;
             top: 0;
-            z-index: 10;
-            background: #ffeedd;
-            border-bottom: 2px solid #ffcc88;
+            z-index: 20;
+            background: rgba(255, 250, 242, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 204, 136, 0.5);
+            scrollbar-width: none;
         }
+        .filter-bar::-webkit-scrollbar { display: none; }
 
         .filter-btn {
             background: white;
-            border: 1px solid #ffaa55;
+            border: 1px solid #ffcc88;
             font-family: 'Outfit', sans-serif;
             font-weight: 600;
             font-size: 0.8rem;
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1.1rem;
             border-radius: 40px;
             cursor: pointer;
             color: #b45f1b;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
+        
         .filter-btn.active {
-            background: linear-gradient(135deg, #ff8c1a, #ffaa33);
-            border-color: #ff8c1a;
+            background: linear-gradient(135deg, #ff8c1a, #ffcc33);
+            border-color: transparent;
             color: white;
-            box-shadow: 0 4px 10px rgba(255, 140, 26, 0.4);
-            transform: scale(1.02);
-        }
-        .filter-btn i {
-            font-size: 0.9rem;
+            box-shadow: 0 6px 15px rgba(255, 140, 26, 0.4);
+            transform: scale(1.02) translateY(-2px);
         }
 
         .menu-content {
-            padding: 1.5rem 1rem 2rem;
+            padding: 1rem 1rem 2rem;
         }
 
         .category-section {
@@ -120,8 +134,8 @@
 
         .category-title {
             font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #cc6b1a, #ffaa33);
+            font-weight: 800;
+            background: linear-gradient(135deg, #b45f1b, #ff8c1a);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -130,120 +144,130 @@
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
+            position: sticky;
+            top: 58px;
+            z-index: 10;
+            background-color: rgba(255, 250, 242, 0.95);
+            padding-top: 8px;
+            padding-bottom: 8px;
+            backdrop-filter: blur(5px);
         }
         .category-title i {
-            font-size: 1.5rem;
-            background: none;
-            -webkit-background-clip: unset;
-            background-clip: unset;
+            font-size: 1.4rem;
             color: #ff8c1a;
+            -webkit-text-fill-color: initial;
+            filter: drop-shadow(0 2px 4px rgba(255, 140, 26, 0.3));
         }
 
         .items-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.8rem;
+            gap: 0.75rem;
         }
         @media (min-width: 600px) {
-            .items-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .items-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
         }
 
+        /* Card con contrasto aumentato */
         .menu-item-card {
             background: #ffffff;
             border-radius: 18px;
             padding: 0.8rem 1rem;
-            border: 1px solid #ffe0b5;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            transform: translateY(20px);
-            opacity: 0;
-            animation: slideUpCard 0.45s forwards;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ffd6a0;  /* Bordo leggermente più scuro */
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08); /* Ombra più pronunciata */
             position: relative;
             overflow: hidden;
+            opacity: 0;
+            transform: translateY(25px) scale(0.97);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                        transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                        box-shadow 0.2s, border-color 0.2s;
         }
-        @keyframes slideUpCard {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        
+        .menu-item-card.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
+
         .menu-item-card:active {
-            transform: scale(0.98);
-            background: #fff7ef;
+            transform: scale(0.97) !important;
             border-color: #ffaa55;
-            box-shadow: 0 8px 20px rgba(255, 140, 26, 0.2);
+            background: #fffcf8;
         }
+
         .ripple-effect {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 200, 100, 0.7) 0%, rgba(255, 140, 26, 0.5) 100%);
+            background: radial-gradient(circle, rgba(255, 170, 50, 0.4) 0%, rgba(255, 140, 26, 0) 70%);
             transform: scale(0);
-            animation: rippleAnim 0.5s linear forwards;
+            animation: rippleAnim 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             pointer-events: none;
         }
         @keyframes rippleAnim {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+            to { transform: scale(4); opacity: 0; }
         }
 
         .item-header {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            gap: 0.5rem;
-            flex-wrap: wrap;
+            gap: 0.8rem;
         }
         .item-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #3e2a1c;
+            font-weight: 700;
+            font-size: 1.05rem;  /* Nome prodotto più grande */
+            color: #2c1e12;
+            line-height: 1.25;
         }
+        
         .item-price {
             font-weight: 800;
-            font-size: 0.85rem;
-            background: linear-gradient(135deg, #fff0e0, #ffe0c0);
-            padding: 0.2rem 0.7rem;
+            font-size: 0.8rem;    /* Prezzo più piccolo */
+            background: linear-gradient(135deg, #ff8c1a, #ffcc33);
+            padding: 0.2rem 0.6rem;
             border-radius: 40px;
-            color: #cc6b1a;
+            color: white;
             white-space: nowrap;
+            box-shadow: 0 3px 8px rgba(255, 140, 26, 0.3);
+            letter-spacing: 0.3px;
         }
+
         .item-ingredients {
-            font-size: 0.7rem;
-            color: #a5713c;
-            margin-top: 0.4rem;
-            line-height: 1.3;
+            font-size: 0.72rem;
+            color: #8c5a30;
+            margin-top: 0.5rem;
+            line-height: 1.35;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.3rem;
         }
         .item-ingredients i {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: #ffaa33;
+            margin-top: 2px;
         }
 
         .info-note {
-            background: #fff0e0;
+            background: linear-gradient(135deg, #fff4e6, #ffeedd);
             text-align: center;
-            padding: 0.5rem;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            color: #b87a3a;
-            margin-top: 0.6rem;
-            border: 1px solid #ffcc88;
+            padding: 0.7rem;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: #b45f1b;
+            margin-top: 0.8rem;
+            border: 1px dashed #ffaa55;
+            font-weight: 500;
         }
 
         footer {
             text-align: center;
-            padding: 1.2rem;
-            font-size: 0.75rem;
+            padding: 2rem 1rem;
+            font-size: 0.8rem;
             color: #b87a3a;
             border-top: 1px solid #ffddb0;
             background: #fff4e6;
+            margin-bottom: env(safe-area-inset-bottom);
         }
         footer i.fa-heart {
             color: #ff6b00;
@@ -253,58 +277,56 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.2); }
         }
+        
         .credit {
-            margin-top: 0.7rem;
-            font-size: 0.7rem;
+            margin-top: 1rem;
+            font-size: 0.75rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.3rem;
-            flex-wrap: wrap;
         }
         .credit span {
-            background: rgba(255, 140, 26, 0.12);
-            padding: 0.2rem 0.7rem;
+            background: white;
+            padding: 0.35rem 1rem;
             border-radius: 30px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #ffe0b5;
         }
         .credit a {
-            color: #cc6b1a;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .credit a:hover {
-            text-decoration: underline;
             color: #ff8c1a;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.2s;
         }
 
         .scroll-top {
             position: fixed;
-            bottom: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom));
             right: 20px;
             background: linear-gradient(135deg, #ff8c1a, #ffcc33);
             color: white;
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.4rem;
             cursor: pointer;
-            box-shadow: 0 6px 18px rgba(255, 140, 26, 0.5);
+            box-shadow: 0 8px 20px rgba(255, 140, 26, 0.4);
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             z-index: 99;
         }
         .scroll-top.show {
             opacity: 1;
             visibility: visible;
+            transform: translateY(0);
         }
         .scroll-top:active {
             transform: scale(0.9);
@@ -326,7 +348,7 @@
         <button class="filter-btn" data-cat="dolci"><i class="fas fa-cookie-bite"></i> Dolce</button>
         <button class="filter-btn" data-cat="salati"><i class="fas fa-cheese"></i> Salato</button>
         <button class="filter-btn" data-cat="pranzo"><i class="fas fa-utensils"></i> Pranzo</button>
-        <button class="filter-btn" data-cat="bevande"><i class="fas fa-bottle-water"></i> Bevande</button>
+        <button class="filter-btn" data-cat="bevande"><i class="fas fa-glass-water"></i> Bevande</button>
         <button class="filter-btn" data-cat="cocktail"><i class="fas fa-cocktail"></i> Cocktail</button>
         <button class="filter-btn" data-cat="viniSpritz"><i class="fas fa-wine-glass-alt"></i> Spritz & Vini</button>
         <button class="filter-btn" data-cat="birre"><i class="fas fa-beer"></i> Birre</button>
@@ -336,9 +358,11 @@
     <div class="menu-content" id="menuContainer"></div>
     
     <footer>
-        <div><i class="fas fa-qrcode"></i> Inquadra il QR code per il menu sempre aggiornato · I prezzi IVA inclusa · <i class="fas fa-heart"></i> Il Sole</div>
+        <div style="margin-bottom: 8px; font-weight: 600;"><i class="fas fa-qrcode"></i> Inquadra il QR code per il menu sempre aggiornato</div>
+        <div>I prezzi IVA inclusa · Fatto con <i class="fas fa-heart"></i> da Il Sole</div>
+        
         <div class="credit">
-            <span><i class="fas fa-code"></i> Creato da <a href="https://www.iartservice.com" target="_blank" rel="noopener noreferrer"><i class="fas fa-laptop-code"></i> IART Service</a></span>
+            <span><i class="fas fa-code"></i> Creato da <a href="https://www.iartservice.com" target="_blank" rel="noopener noreferrer">IART Service</a></span>
         </div>
     </footer>
 </div>
@@ -346,7 +370,6 @@
 <button class="scroll-top" id="scrollTopBtn"><i class="fas fa-arrow-up"></i></button>
 
 <script>
-    // ------------------------ MENU COMPLETO ------------------------
     const menuData = {
         caffetteria: [
             { name: "Caffè", price: "1,20 €" }, { name: "Caffè deca", price: "1,20 €" },
@@ -437,13 +460,12 @@
         ]
     };
 
-    // Icone per ogni categoria (tutte testate e funzionanti)
     const categoryIcons = {
         caffetteria: "fa-mug-hot",
         dolci: "fa-cookie-bite",
         salati: "fa-cheese",
         pranzo: "fa-utensils",
-        bevande: "fa-bottle-water",   // ← icona corretta e funzionante
+        bevande: "fa-glass-water",
         cocktail: "fa-cocktail",
         viniSpritz: "fa-wine-glass-alt",
         birre: "fa-beer",
@@ -461,6 +483,22 @@
         speciali: "Specialità della Casa"
     };
     const sectionOrder = ["caffetteria", "dolci", "salati", "pranzo", "bevande", "cocktail", "viniSpritz", "birre", "speciali"];
+
+    // Intersection Observer per animare le card allo scroll
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -40px 0px',
+        threshold: 0.1
+    };
+
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
 
     function addRipple(event, card) {
         let clientX, clientY;
@@ -480,16 +518,14 @@
         ripple.style.width = ripple.style.height = `${size}px`;
         ripple.style.left = `${x}px`;
         ripple.style.top = `${y}px`;
-        card.style.position = 'relative';
         card.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 500);
+        setTimeout(() => ripple.remove(), 600);
     }
 
-    function createItemCard(item, idx) {
+    function createItemCard(item) {
         const card = document.createElement("div");
         card.className = "menu-item-card";
-        card.style.animationDelay = `${idx * 0.01}s`;
-        card.addEventListener('touchstart', (e) => addRipple(e, card));
+        card.addEventListener('touchstart', (e) => addRipple(e, card), {passive: true});
         card.addEventListener('mousedown', (e) => addRipple(e, card));
         
         const header = document.createElement("div");
@@ -507,9 +543,11 @@
         if (item.ingredients) {
             const ing = document.createElement("div");
             ing.className = "item-ingredients";
-            ing.innerHTML = `<i class="fas fa-leaf"></i> ${item.ingredients}`;
+            ing.innerHTML = `<i class="fas fa-leaf"></i> <span>${item.ingredients}</span>`;
             card.appendChild(ing);
         }
+        
+        cardObserver.observe(card);
         return card;
     }
 
@@ -543,8 +581,8 @@
             `;
             container.appendChild(section);
             const grid = section.querySelector(`.items-grid`);
-            items.forEach((item, idx) => {
-                grid.appendChild(createItemCard(item, idx));
+            items.forEach((item) => {
+                grid.appendChild(createItemCard(item));
             });
             
             if (key === "birre") {
@@ -564,15 +602,21 @@
 
     function initFilters() {
         const btns = document.querySelectorAll(".filter-btn");
+        const filterBar = document.getElementById("filterBar");
+        
         btns.forEach(btn => {
             btn.addEventListener("click", function() {
                 const cat = this.getAttribute("data-cat");
                 btns.forEach(b => b.classList.remove("active"));
                 this.classList.add("active");
                 renderMenu(cat);
+                
+                const scrollPos = this.offsetLeft - (filterBar.offsetWidth / 2) + (this.offsetWidth / 2);
+                filterBar.scrollTo({ left: scrollPos, behavior: 'smooth' });
+                
                 setTimeout(() => {
                     document.getElementById("filterBar").scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 80);
+                }, 50);
             });
         });
     }
@@ -581,7 +625,8 @@
     window.addEventListener("scroll", () => {
         if (window.scrollY > 300) scrollBtn.classList.add("show");
         else scrollBtn.classList.remove("show");
-    });
+    }, {passive: true});
+    
     scrollBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
     renderMenu("all");
