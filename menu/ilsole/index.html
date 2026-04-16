@@ -19,7 +19,7 @@
         }
 
         body {
-            background: #f0e0c8;  /* Sfondo più scuro per aumentare il contrasto con le card bianche */
+            background: #f0e0c8;
             font-family: 'Outfit', sans-serif;
             color: #2c1e12;
             padding: 0;
@@ -67,8 +67,9 @@
             justify-content: center;
         }
 
+        /* Logo ingrandito da 170px a 240px */
         .main-logo {
-            max-width: 170px;
+            max-width: 240px;
             width: 100%;
             height: auto;
             filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
@@ -169,13 +170,12 @@
             .items-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
         }
 
-        /* Card con contrasto aumentato */
         .menu-item-card {
             background: #ffffff;
             border-radius: 18px;
             padding: 0.8rem 1rem;
-            border: 1px solid #ffd6a0;  /* Bordo leggermente più scuro */
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08); /* Ombra più pronunciata */
+            border: 1px solid #ffd6a0;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
             position: relative;
             overflow: hidden;
             opacity: 0;
@@ -216,14 +216,14 @@
         }
         .item-name {
             font-weight: 700;
-            font-size: 1.05rem;  /* Nome prodotto più grande */
+            font-size: 1.05rem;
             color: #2c1e12;
             line-height: 1.25;
         }
         
         .item-price {
             font-weight: 800;
-            font-size: 0.8rem;    /* Prezzo più piccolo */
+            font-size: 0.8rem;
             background: linear-gradient(135deg, #ff8c1a, #ffcc33);
             padding: 0.2rem 0.6rem;
             border-radius: 40px;
@@ -348,7 +348,7 @@
         <button class="filter-btn" data-cat="dolci"><i class="fas fa-cookie-bite"></i> Dolce</button>
         <button class="filter-btn" data-cat="salati"><i class="fas fa-cheese"></i> Salato</button>
         <button class="filter-btn" data-cat="pranzo"><i class="fas fa-utensils"></i> Pranzo</button>
-        <button class="filter-btn" data-cat="bevande"><i class="fas fa-glass-water"></i> Bevande</button>
+        <button class="filter-btn" data-cat="bevande"><i class="fas fa-bottle-water"></i> Bevande</button>
         <button class="filter-btn" data-cat="cocktail"><i class="fas fa-cocktail"></i> Cocktail</button>
         <button class="filter-btn" data-cat="viniSpritz"><i class="fas fa-wine-glass-alt"></i> Spritz & Vini</button>
         <button class="filter-btn" data-cat="birre"><i class="fas fa-beer"></i> Birre</button>
@@ -465,7 +465,7 @@
         dolci: "fa-cookie-bite",
         salati: "fa-cheese",
         pranzo: "fa-utensils",
-        bevande: "fa-glass-water",
+        bevande: "fa-bottle-water",   // Icona corretta e funzionante
         cocktail: "fa-cocktail",
         viniSpritz: "fa-wine-glass-alt",
         birre: "fa-beer",
@@ -484,7 +484,6 @@
     };
     const sectionOrder = ["caffetteria", "dolci", "salati", "pranzo", "bevande", "cocktail", "viniSpritz", "birre", "speciali"];
 
-    // Intersection Observer per animare le card allo scroll
     const observerOptions = {
         root: null,
         rootMargin: '0px 0px -40px 0px',
