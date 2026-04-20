@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Il Sole | 40 Ricette Cocktail – Guida Barman</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #f0e0c8;
+            font-family: 'Outfit', sans-serif;
+            color: #2c1e12;
+            padding: 0;
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .menu-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fffaf2;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border-radius: 0 0 28px 28px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(145deg, #ff8c1a 0%, #ffcc33 100%);
+            padding: 1.5rem 1rem 1.2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255, 255, 200, 0.25) 30px, rgba(255, 255, 200, 0.25) 60px);
+            animation: sunBeam 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes sunBeam {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255, 255, 200, 0.4) 0%, rgba(255, 140, 26, 0) 70%);
+            animation: centralGlow 3s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        
+        @keyframes centralGlow {
+            0% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.2); }
+        }
+        
+        .hero .shine {
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(25deg);
+            animation: diagonalShine 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes diagonalShine {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            100% { transform: translateX(100%) rotate(25deg); }
+        }
+
+        .logo-area {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-logo {
+            max-width: 260px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 12px 20px rgba(0,0,0,0.3));
+            animation: floatLogo 6s ease-in-out infinite;
+        }
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Barra ricerca live */
+        .search-bar {
+            padding: 0.8rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 250, 242, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 204, 136, 0.6);
+            display: flex;
+            align-items: center;
+        }
+        .search-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 60px;
+            padding: 0.3rem 0.3rem 0.3rem 1.2rem;
+            border: 1px solid #ffcc88;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .search-wrapper i {
+            color: #b45f1b;
+            font-size: 1rem;
+        }
+        .search-wrapper input {
+            flex: 1;
+            border: none;
+            padding: 0.8rem 0.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            background: transparent;
+            outline: none;
+            color: #2c1e12;
+        }
+        .search-wrapper input::placeholder {
+            color: #bb9b7a;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+        .clear-search {
+            margin-left: 8px;
+            background: transparent;
+            border: 1px solid #ffcc88;
+            color: #b45f1b;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .clear-search:active {
+            background: #ffeedd;
+        }
+
+        .menu-content {
+            padding: 1.2rem 1rem 2rem;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #b45f1b, #ff8c1a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border-left: 5px solid #ffaa33;
+            padding-left: 0.8rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .category-title i {
+            font-size: 1.4rem;
+            color: #ff8c1a;
+            -webkit-text-fill-color: initial;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+        @media (min-width: 600px) {
+            .items-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        }
+
+        .menu-item-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            border: 1px solid #ffd6a0;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(25px) scale(0.97);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                        transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        .menu-item-card.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .menu-item-card:active {
+            transform: scale(0.97) !important;
+            border-color: #ffaa55;
+            background: #fffcf8;
+        }
+
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 170, 50, 0.4) 0%, rgba(255, 140, 26, 0) 70%);
+            transform: scale(0);
+            animation: rippleAnim 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+        .item-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2c1e12;
+        }
+
+        .recipe-details {
+            margin-top: 0.5rem;
+            border-top: 1px dashed #ffccaa;
+            padding-top: 0.7rem;
+        }
+        .ingredients-line {
+            font-size: 0.8rem;
+            color: #7a4f28;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .ingredients-line i {
+            color: #ffaa33;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+            min-width: 16px;
+        }
+        .prep-line {
+            font-size: 0.8rem;
+            color: #5a3e2a;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            background: #fff7ef;
+            padding: 0.5rem 0.7rem;
+            border-radius: 14px;
+            margin-top: 0.4rem;
+        }
+        .prep-line i {
+            color: #ff8c1a;
+            font-size: 0.9rem;
+            margin-top: 0.1rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #b87a3a;
+            font-size: 1.1rem;
+            background: #fff4e6;
+            border-radius: 30px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: 0.8rem;
+            color: #b87a3a;
+            border-top: 1px solid #ffddb0;
+            background: #fff4e6;
+        }
+        footer i.fa-heart {
+            color: #ff6b00;
+            animation: heartbeat 1.5s infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .credit {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: center;
+        }
+        .credit span {
+            background: white;
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #ffe0b5;
+        }
+        .credit a {
+            color: #ff8c1a;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            right: 20px;
+            background: linear-gradient(135deg, #ff8c1a, #ffcc33);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 140, 26, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            border: none;
+            z-index: 99;
+        }
+        .scroll-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-wrapper">
+    <div class="hero">
+        <div class="shine"></div>
+        <div class="logo-area">
+            <img src="logoilsole.png" alt="Il Sole Logo" class="main-logo">
+        </div>
+    </div>
+
+    <!-- Barra di ricerca live -->
+    <div class="search-bar">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Cerca cocktail o ingrediente..." autocomplete="off">
+        </div>
+        <button class="clear-search" id="clearSearchBtn" aria-label="Cancella"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="menu-content" id="menuContainer"></div>
+    
+    <footer>
+        <div style="margin-bottom: 8px; font-weight: 600;"><i class="fas fa-qrcode"></i> Ricette riservate al personale · Il Sole</div>
+        <div>Dosi standard · Fatti con <i class="fas fa-heart"></i> per un servizio perfetto</div>
+        <div class="credit">
+            <span><i class="fas fa-code"></i> Creato da <a href="https://www.iartservice.com" target="_blank" rel="noopener noreferrer">IART Service</a></span>
+        </div>
+    </footer>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+    (function(){
+        "use strict";
+
+        // ----- 40 COCKTAIL CON DOSI E PREPARAZIONE (basati sul menu + nuovi) -----
+        const cocktailRecipes = [
+            // Dal menu originale (32 cocktail)
+            { name: "Americano", ingredients: "Campari 3 cl, Vermouth Rosso 3 cl, soda q.b.", prep: "Versare Campari e Vermouth in tumbler con ghiaccio, colmare con soda. Guarnire con fetta d'arancia." },
+            { name: "Caipirinha", ingredients: "Cachaça 5 cl, 1 lime, 2 cucchiaini zucchero", prep: "Tagliare lime a spicchi, pestare con zucchero. Aggiungere ghiaccio e Cachaça, mescolare." },
+            { name: "Caipirissima", ingredients: "Rum bianco 5 cl, 1 lime, 2 cucchiaini zucchero", prep: "Come Caipirinha, sostituendo Cachaça con Rum bianco." },
+            { name: "Caipiroska", ingredients: "Vodka 5 cl, 1 lime, 2 cucchiaini zucchero", prep: "Pestare lime e zucchero, ghiaccio, completare con Vodka." },
+            { name: "Caipiroska alla Pesca", ingredients: "Vodka 5 cl, 1/2 pesca matura, 1 lime, zucchero", prep: "Pestare mezza pesca insieme a lime e zucchero. Aggiungere ghiaccio e Vodka." },
+            { name: "Caipitequila", ingredients: "Tequila 5 cl, 1 lime, 2 cucchiaini zucchero", prep: "Pestare lime e zucchero, ghiaccio, Tequila." },
+            { name: "Cocktail analcolico", ingredients: "Frutta fresca, 2 cl sciroppo di zucchero, ginger ale q.b.", prep: "Muddle frutta a scelta, aggiungere sciroppo, ghiaccio e ginger ale. Mescolare." },
+            { name: "Daiquiri", ingredients: "Rum bianco 6 cl, succo di lime 3 cl, sciroppo di zucchero 2 cl", prep: "Shakerare tutti gli ingredienti con ghiaccio, filtrare in coppetta." },
+            { name: "Dirty Martini", ingredients: "Gin 6 cl, Vermouth Dry 1 cl, 1 cucchiaino salamoia olive", prep: "Miscelare Gin e Vermouth con ghiaccio, aggiungere salamoia. Filtrare in coppa, guarnire con olive." },
+            { name: "Espresso Martini", ingredients: "Vodka 5 cl, liquore al caffè 1 cl, 1 espresso", prep: "Shakerare energicamente tutti gli ingredienti con ghiaccio. Filtrare in coppa, chicchi di caffè sopra." },
+            { name: "Gin Tonic", ingredients: "Gin 5 cl, acqua tonica q.b., lime", prep: "Riempire bicchiere balloon di ghiaccio, versare Gin, colmare con tonica. Spremere lime e aggiungere la scorza." },
+            { name: "Gin Tonic Premium", ingredients: "Gin premium 5 cl, Fever Tree q.b., lime", prep: "Stessa preparazione con Gin selezionato e tonica premium. Guarnire con scorza di pompelmo." },
+            { name: "Hugo Spritz", ingredients: "Prosecco 15 cl, sciroppo di sambuco 3 cl, soda, menta, lime", prep: "Ghiaccio in calice, sciroppo di sambuco, Prosecco, splash di soda. Lime e menta." },
+            { name: "Kamikaze", ingredients: "Vodka 3 cl, Triple Sec 3 cl, succo di lime 3 cl", prep: "Shakerare e filtrare in bicchierino ghiacciato." },
+            { name: "London Mule", ingredients: "Gin 5 cl, succo di lime 2 cl, ginger beer q.b.", prep: "Ghiaccio in mug, Gin e succo di lime, colmare con ginger beer. Fetta di lime." },
+            { name: "Madras", ingredients: "Vodka 4 cl, succo d'arancia 12 cl, succo di mirtillo 4 cl", prep: "Versare Vodka, succo d'arancia e cranberry in tumbler con ghiaccio. Mescolare." },
+            { name: "Mai Tai", ingredients: "Rum scuro 4 cl, Rum bianco 2 cl, Curaçao 1.5 cl, orzata 1.5 cl, lime 1 cl", prep: "Shakerare rum, Curaçao, orzata, lime. Versare in tumbler con ghiaccio, guarnire menta." },
+            { name: "Margarita", ingredients: "Tequila 5 cl, Triple Sec 2 cl, succo di lime 1.5 cl", prep: "Shakerare, filtrare in coppa con bordo di sale." },
+            { name: "Mexican Mule", ingredients: "Tequila 5 cl, succo di lime 2 cl, ginger beer q.b.", prep: "Mug con ghiaccio, Tequila, lime, ginger beer." },
+            { name: "Mojito", ingredients: "Rum bianco 5 cl, 1 lime, 2 cucchiaini zucchero, 6-8 foglie menta, soda", prep: "Pestare menta con zucchero e lime, ghiaccio, Rum, soda. Mescolare." },
+            { name: "Moscow Mule", ingredients: "Vodka 5 cl, succo di lime 2 cl, ginger beer q.b.", prep: "Mug di rame, ghiaccio, Vodka, succo di lime, ginger beer." },
+            { name: "Negroni", ingredients: "Gin 3 cl, Campari 3 cl, Vermouth Rosso 3 cl", prep: "Versare in parti uguali in tumbler con ghiaccio, mescolare. Guarnire con arancia." },
+            { name: "Paloma", ingredients: "Tequila 5 cl, succo di lime 2 cl, soda al pompelmo q.b.", prep: "Tumbler con ghiaccio, Tequila, succo di lime, colmare con soda al pompelmo." },
+            { name: "Panaché", ingredients: "Birra chiara 50%, limonata 50%", prep: "Versare in parti uguali birra e limonata in bicchiere alto con ghiaccio." },
+            { name: "Penicillin", ingredients: "Scotch blended 6 cl, succo di limone 2.5 cl, sciroppo miele-zenzero 2 cl, Scotch torbato 1 cl", prep: "Shakerare Scotch blended, limone, sciroppo. Filtrare in tumbler con ghiaccio, versare goccio di Scotch torbato sopra." },
+            { name: "Piña Colada", ingredients: "Rum 5 cl, crema di cocco 5 cl, succo d'ananas 10 cl", prep: "Frullare con ghiaccio: Rum, succo ananas, crema di cocco. Servire in calice." },
+            { name: "Quattro Bianchi", ingredients: "Vodka 2 cl, Gin 2 cl, Rum 2 cl, Tequila 2 cl", prep: "Shakerare parti uguali con ghiaccio, filtrare in tumbler con ghiaccio. Guarnire limone." },
+            { name: "Sbagliato", ingredients: "Campari 3 cl, Vermouth Rosso 3 cl, Prosecco 6 cl", prep: "Versare Campari e Vermouth in calice con ghiaccio, colmare con Prosecco." },
+            { name: "Sex on the Beach", ingredients: "Vodka 4 cl, liquore alla pesca 2 cl, succo d'arancia 4 cl, succo di mirtillo 4 cl", prep: "Shakerare Vodka, liquore pesca, succo arancia e cranberry. Versare in tumbler con ghiaccio." },
+            { name: "Tommy's Margarita", ingredients: "Tequila 5 cl, succo di lime 2 cl, nettare d'agave 1 cl", prep: "Shakerare Tequila, lime, agave. Servire in tumbler con ghiaccio." },
+            { name: "Whiskey Sour", ingredients: "Bourbon 4.5 cl, succo di limone 3 cl, sciroppo di zucchero 1.5 cl", prep: "Shakerare con ghiaccio, filtrare in tumbler con ghiaccio. Guarnire ciliegia." },
+            { name: "White Spritz", ingredients: "Prosecco 10 cl, purea/liquore di pera 3 cl, soda, lime", prep: "Calice con ghiaccio, purea di pera o liquore, Prosecco, splash di soda, lime." },
+            // 8 nuovi cocktail per arrivare a 40
+            { name: "Aperol Spritz", ingredients: "Prosecco 9 cl, Aperol 6 cl, soda q.b.", prep: "Calice con ghiaccio, Prosecco, Aperol, colmare con soda. Guarnire con fetta d'arancia." },
+            { name: "Bellini", ingredients: "Prosecco 10 cl, purea di pesca bianca 5 cl", prep: "Versare purea di pesca in flûte, colmare con Prosecco freddo. Mescolare delicatamente." },
+            { name: "Bloody Mary", ingredients: "Vodka 4.5 cl, succo di pomodoro 9 cl, limone 1.5 cl, Worcestershire, Tabasco, sale, pepe", prep: "Shakerare con ghiaccio (eccetto ghiaccio nel bicchiere). Versare in tumbler con ghiaccio, guarnire con sedano." },
+            { name: "Cosmopolitan", ingredients: "Vodka 4 cl, Triple Sec 1.5 cl, succo di lime 1.5 cl, succo di mirtillo 3 cl", prep: "Shakerare con ghiaccio, filtrare in coppa. Guarnire con scorza d'arancia." },
+            { name: "Cuba Libre", ingredients: "Rum bianco 5 cl, cola q.b., lime", prep: "Tumbler con ghiaccio, Rum, succo di lime, colmare con cola. Spicchio di lime." },
+            { name: "Long Island Iced Tea", ingredients: "Vodka 1.5 cl, Gin 1.5 cl, Rum 1.5 cl, Tequila 1.5 cl, Triple Sec 1.5 cl, limone 2 cl, cola", prep: "Shakerare alcolici e limone, versare in tumbler con ghiaccio, colmare con cola." },
+            { name: "Old Fashioned", ingredients: "Bourbon 6 cl, 1 zolletta zucchero, 2 dash Angostura, soda", prep: "Imbibire zucchero con Angostura e poca soda, pestare. Aggiungere Bourbon e ghiaccio, mescolare. Guarnire con scorza d'arancia." },
+            { name: "Spritz al Campari", ingredients: "Prosecco 9 cl, Campari 6 cl, soda q.b.", prep: "Calice con ghiaccio, Prosecco, Campari, colmare con soda. Guarnire con fetta d'arancia." }
+        ];
+
+        // Ordinamento alfabetico
+        cocktailRecipes.sort((a, b) => a.name.localeCompare(b.name, 'it'));
+
+        const container = document.getElementById('menuContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const scrollBtn = document.getElementById('scrollTopBtn');
+
+        // Observer per animazioni
+        const observerOptions = { root: null, rootMargin: '0px 0px -40px 0px', threshold: 0.1 };
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    cardObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        function addRipple(event, card) {
+            let clientX, clientY;
+            if (event.touches) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            const rect = card.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = clientX - rect.left - size / 2;
+            const y = clientY - rect.top - size / 2;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple-effect';
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            card.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function createRecipeCard(recipe) {
+            const card = document.createElement("div");
+            card.className = "menu-item-card";
+            card.addEventListener('touchstart', (e) => addRipple(e, card), {passive: true});
+            card.addEventListener('mousedown', (e) => addRipple(e, card));
+
+            const header = document.createElement("div");
+            header.className = "item-header";
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "item-name";
+            nameSpan.innerText = recipe.name;
+            header.appendChild(nameSpan);
+            card.appendChild(header);
+
+            const details = document.createElement("div");
+            details.className = "recipe-details";
+            
+            const ingDiv = document.createElement("div");
+            ingDiv.className = "ingredients-line";
+            ingDiv.innerHTML = `<i class="fas fa-flask"></i><span><strong>Ingredienti:</strong> ${recipe.ingredients}</span>`;
+            details.appendChild(ingDiv);
+            
+            const prepDiv = document.createElement("div");
+            prepDiv.className = "prep-line";
+            prepDiv.innerHTML = `<i class="fas fa-blender"></i><span><strong>Prep:</strong> ${recipe.prep}</span>`;
+            details.appendChild(prepDiv);
+            
+            card.appendChild(details);
+            cardObserver.observe(card);
+            return card;
+        }
+
+        function renderFilteredRecipes(searchTerm = '') {
+            container.innerHTML = '';
+            const term = searchTerm.trim().toLowerCase();
+            
+            const filtered = term === '' 
+                ? cocktailRecipes 
+                : cocktailRecipes.filter(c => c.name.toLowerCase().includes(term) || 
+                                            c.ingredients.toLowerCase().includes(term));
+            
+            if (filtered.length === 0) {
+                const noRes = document.createElement("div");
+                noRes.className = "no-results";
+                noRes.innerHTML = `<i class="fas fa-search" style="font-size:2rem; opacity:0.5; margin-bottom:1rem; display:block;"></i> 
+                                   Nessun cocktail trovato per "<strong>${searchTerm}</strong>"`;
+                container.appendChild(noRes);
+                return;
+            }
+            
+            const section = document.createElement("div");
+            section.className = "category-section";
+            section.innerHTML = `
+                <div class="category-title">
+                    <i class="fas fa-cocktail"></i>
+                    <span>Ricette Cocktail (${filtered.length})</span>
+                </div>
+                <div class="items-grid" id="recipeGrid"></div>
+            `;
+            container.appendChild(section);
+            const grid = section.querySelector('#recipeGrid');
+            
+            filtered.forEach(recipe => {
+                grid.appendChild(createRecipeCard(recipe));
+            });
+        }
+
+        // RICERCA LIVE (mentre scrivi)
+        let debounceTimer;
+        function performSearch() {
+            renderFilteredRecipes(searchInput.value);
+        }
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(performSearch, 200);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            performSearch();
+            searchInput.focus();
+        });
+
+        // Scroll top
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 300) scrollBtn.classList.add("show");
+            else scrollBtn.classList.remove("show");
+        }, {passive: true});
+        
+        scrollBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Inizializza
+        renderFilteredRecipes('');
+    })();
+</script>
+</body>
+</html>
