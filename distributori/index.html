@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FuelFinder – Prezzi reali carburanti (Mimit)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f0f4fa;
+            margin: 0;
+            padding: 20px;
+            color: #0f172a;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 32px;
+            padding: 22px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        h1 small {
+            font-size: 0.7rem;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: #2563eb;
+        }
+        .sub {
+            color: #334155;
+            margin-bottom: 18px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            margin-top: 16px;
+        }
+        .fuel-group {
+            flex: 2;
+            min-width: 160px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        select, input, button {
+            border-radius: 60px;
+            border: 1px solid #cbd5e1;
+            padding: 12px 18px;
+            font-size: 0.9rem;
+            background: white;
+            width: 100%;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        button:hover { background: #2563eb; transform: scale(0.97); }
+        .location-bar {
+            background: #f8fafc;
+            border-radius: 60px;
+            padding: 10px 20px;
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .loc-status {
+            font-family: monospace;
+            background: #e2e8f0;
+            padding: 5px 14px;
+            border-radius: 32px;
+            font-size: 0.8rem;
+        }
+        .stations-panel {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+        .panel-header {
+            padding: 18px 24px 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #eef2ff;
+        }
+        .badge {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 14px 16px 14px 24px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .station-name {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .consigliato {
+            background: #22c55e;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+        .price-cell {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+        .no-data, .loading {
+            text-align: center;
+            padding: 50px 20px;
+            color: #475569;
+        }
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 24px;
+            padding: 12px 18px;
+            margin: 12px 20px;
+            font-size: 0.85rem;
+        }
+        .warning-box {
+            background: #fef9c3;
+            border-left: 5px solid #eab308;
+            padding: 12px 16px;
+            margin: 12px 20px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+        }
+        footer {
+            margin-top: 24px;
+            font-size: 0.7rem;
+            text-align: center;
+            color: #5b6e8c;
+        }
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #cbd5e1;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 750px) {
+            body { padding: 12px; }
+            th, td { padding: 10px 8px 10px 16px; }
+        }
+        .file-upload-area {
+            padding: 12px 24px 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border-top: 1px solid #eef2ff;
+        }
+        .small-btn {
+            background: #475569;
+            padding: 8px 16px;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>⛽ FuelFinder <small>Dati ufficiali Mimit (Osservatorio prezzi carburanti)</small></h1>
+        <div class="sub">Ricerca in tempo reale sui distributori più vicini. Prezzi aggiornati quotidianamente.</div>
+        
+        <div class="flex-row">
+            <div class="fuel-group">
+                <label>🚗 Tipo carburante</label>
+                <select id="fuelSelect">
+                    <option value="Benzina">⛽ Benzina</option>
+                    <option value="Diesel">🛢️ Diesel</option>
+                    <option value="Gpl">💨 GPL</option>
+                    <option value="Metano">🔹 Metano</option>
+                </select>
+            </div>
+            <div class="fuel-group">
+                <label>📡 Raggio (km)</label>
+                <input type="number" id="rangeKm" value="10" step="1" min="1" max="50">
+            </div>
+            <button id="searchBtn">🔍 Cerca distributori reali</button>
+        </div>
+        
+        <div class="location-bar">
+            <div>📍 <strong>Posizione</strong> <span id="locText" class="loc-status">In rilevamento...</span></div>
+            <button id="refreshLocBtn" style="width: auto;">🔄 Aggiorna posizione</button>
+        </div>
+    </div>
+
+    <div class="stations-panel">
+        <div class="panel-header">
+            <span><strong>📍 Distributori più vicini</strong> (ordinati per distanza)</span>
+            <span class="badge" id="dataSourceBadge">📡 fonte: Mimit API</span>
+        </div>
+        <div id="stationsContainer">
+            <div class="loading">⏳ Attendi la geolocalizzazione e premi "Cerca"</div>
+        </div>
+        <div class="file-upload-area">
+            <button id="manualCsvBtn" class="small-btn">📂 Carica file CSV/JSON (dati Mimit)</button>
+            <a href="https://www.mimit.gov.it/it/open-data/bollettino-prezzi-degli-carburanti" target="_blank" style="font-size:0.75rem;">⬇️ Scarica il file ufficiale giornaliero (CSV)</a>
+            <input type="file" id="fileUpload" accept=".csv,.json" style="display:none;">
+        </div>
+    </div>
+    <footer>
+        🧮 <strong>Consigliato</strong> = minimo punteggio (prezzo €/L + 0.05 × distanza km).<br>
+        🔧 <strong>Nota:</strong> Se apri questa pagina localmente (file://), potresti avere errori di fetch. Carica il file su GitHub Pages o avvia un server locale (es. `python -m http.server 8000`).
+    </footer>
+</div>
+
+<script>
+    // -------------------------------
+    // STATO GLOBALE
+    // -------------------------------
+    let currentUserCoords = null;
+    let currentFuel = "Benzina";
+    let currentRangeKm = 10;
+    let lastStations = [];
+
+    // DOM elements
+    const fuelSelect = document.getElementById("fuelSelect");
+    const rangeInput = document.getElementById("rangeKm");
+    const searchBtn = document.getElementById("searchBtn");
+    const refreshLocBtn = document.getElementById("refreshLocBtn");
+    const locTextSpan = document.getElementById("locText");
+    const stationsContainer = document.getElementById("stationsContainer");
+    const dataSourceBadge = document.getElementById("dataSourceBadge");
+    const manualCsvBtn = document.getElementById("manualCsvBtn");
+    const fileUpload = document.getElementById("fileUpload");
+
+    // Helper distanza Haversine (km)
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function formatDistance(km) {
+        return km < 1 ? `${(km*1000).toFixed(0)} m` : `${km.toFixed(1)} km`;
+    }
+
+    function combinedScore(price, dist) {
+        return price + (dist * 0.05);
+    }
+
+    // Render tabella
+    function renderStations(stations, fuelType, source) {
+        if (!stations.length) {
+            stationsContainer.innerHTML = `<div class="no-data">⚠️ Nessun distributore trovato con carburante ${fuelType} nel raggio selezionato.</div>`;
+            return;
+        }
+        const sorted = [...stations].sort((a,b) => a.distance - b.distance);
+        const recommended = sorted.reduce((best, cur) => cur.score < best.score ? cur : best, sorted[0]);
+
+        let html = `<div style="overflow-x:auto;"><table><thead>`;
+        html += `<tr><th>Distributore</th><th>Indirizzo</th><th>Prezzo (€/L)</th><th>Distanza</th><th></th></tr>`;
+        html += `</thead><tbody>`;
+        for (const s of sorted) {
+            const isRec = s.id === recommended.id;
+            html += `<tr style="${isRec ? 'background:#fefce8;' : ''}">
+                        <td class="station-name">
+                            ${escapeHtml(s.name)} 
+                            ${isRec ? '<span class="consigliato">⭐ CONSIGLIATO</span>' : ''}
+                          </td>
+                          <td>${escapeHtml(s.address || '—')}</td>
+                         <td class="price-cell">${s.price.toFixed(3)} €/L</td>
+                         <td class="distance-cell">${formatDistance(s.distance)}</td>
+                         <td style="font-size:0.7rem;">${isRec ? `punteggio: ${s.score.toFixed(3)}` : ''}</td>
+                       </tr>`;
+        }
+        html += `</tbody></table></div>`;
+        html += `<div style="padding: 14px 24px; background:#f1f5f9; margin:12px; border-radius:24px;">
+                    🎯 <strong>Consigliato per ${fuelType}</strong>: ${escapeHtml(recommended.name)} – 
+                    Prezzo ${recommended.price.toFixed(3)} €/L – Distanza ${formatDistance(recommended.distance)} – 
+                    punteggio ${recommended.score.toFixed(3)} (minore è meglio).<br>
+                    📌 Fonte: ${source}
+                </div>`;
+        stationsContainer.innerHTML = html;
+        dataSourceBadge.innerText = `✅ ${stations.length} distributori (${source})`;
+    }
+
+    // -------------------------------
+    // LISTA DI PROXY CORS DA PROVARE IN SEQUENZA
+    // -------------------------------
+    const proxyList = [
+        { name: "thingproxy.freeboard.io", url: (apiUrl) => `https://thingproxy.freeboard.io/fetch/${apiUrl}` },
+        { name: "corsproxy.io", url: (apiUrl) => `https://corsproxy.io/?${encodeURIComponent(apiUrl)}` },
+        { name: "cors.x2u.in", url: (apiUrl) => `https://cors.x2u.in/${encodeURIComponent(apiUrl)}` },
+        { name: "api.allorigins.win (POST via GET fallback)", url: (apiUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`, method: 'GET' }
+    ];
+
+    // Funzione che tenta i proxy uno per uno
+    async function fetchWithProxyFallback(lat, lng, rangeKm, fuelType) {
+        const apiUrl = "https://carburanti.mise.gov.it/ospzSearch/server/oss_prezzi_search.php";
+        const formData = new URLSearchParams();
+        formData.append("lat", lat);
+        formData.append("lng", lng);
+        formData.append("distanza", rangeKm);
+        formData.append("tipoRicerca", "distanza");
+        formData.append("carburante", fuelType);
+        formData.append("tipoImpianto", "Stradale");
+
+        for (const proxy of proxyList) {
+            try {
+                console.log(`Tentativo proxy: ${proxy.name}`);
+                const fullUrl = proxy.url(apiUrl);
+                const method = proxy.method || 'POST';
+                const fetchOptions = {
+                    method: method,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                };
+                if (method === 'POST') {
+                    fetchOptions.body = formData.toString();
+                } else if (method === 'GET') {
+                    // per GET dobbiamo aggiungere i parametri all'URL
+                    const getUrl = `${fullUrl}&${formData.toString()}`;
+                    fetchOptions.method = 'GET';
+                    delete fetchOptions.body;
+                    var finalUrl = getUrl;
+                } else {
+                    var finalUrl = fullUrl;
+                }
+                
+                const response = await fetch(finalUrl || fullUrl, fetchOptions);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    // Mappa i campi
+                    const stations = data.map(item => {
+                        let price = parseFloat(item.prezzo);
+                        if (isNaN(price)) return null;
+                        let distance = parseFloat(item.distanza);
+                        if (isNaN(distance)) {
+                            distance = haversineDistance(lat, lng, parseFloat(item.lat), parseFloat(item.lng));
+                        }
+                        const score = combinedScore(price, distance);
+                        return {
+                            id: item.id || item.codiceImpianto || Math.random(),
+                            name: item.nomeImpianto || item.nome || "Distributore",
+                            address: item.indirizzo || "",
+                            lat: parseFloat(item.lat),
+                            lon: parseFloat(item.lng),
+                            price: price,
+                            distance: distance,
+                            score: score
+                        };
+                    }).filter(s => s !== null && s.price > 0);
+                    if (stations.length) {
+                        return { stations, proxyName: proxy.name };
+                    }
+                }
+            } catch (err) {
+                console.warn(`Proxy ${proxy.name} fallito:`, err.message);
+                continue;
+            }
+        }
+        throw new Error("Nessun proxy funzionante");
+    }
+
+    // -------------------------------
+    // PARSER CSV UFFICIALE (formato Mimit)
+    // -------------------------------
+    function parseMimitCSV(csvText) {
+        const lines = csvText.split(/\r?\n/);
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(';').map(h => h.replace(/"/g, '').trim());
+        const results = [];
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const values = line.split(';');
+            const obj = {};
+            headers.forEach((h, idx) => { obj[h] = values[idx] ? values[idx].replace(/"/g, '').trim() : ''; });
+            
+            const nome = obj['Nome impianto'] || obj['nomeImpianto'] || obj['Gestore'] || obj['nome'];
+            const indirizzo = obj['Indirizzo'] || obj['indirizzo'];
+            const lat = parseFloat(obj['Latitudine'] || obj['lat']);
+            const lon = parseFloat(obj['Longitudine'] || obj['lng']);
+            const prezzoBenzina = parseFloat(obj['Benzina'] || obj['prezzo_benzina']);
+            const prezzoDiesel = parseFloat(obj['Diesel'] || obj['prezzo_diesel']);
+            const prezzoGpl = parseFloat(obj['Gpl'] || obj['prezzo_gpl']);
+            const prezzoMetano = parseFloat(obj['Metano'] || obj['prezzo_metano']);
+            
+            if (isNaN(lat) || isNaN(lon)) continue;
+            results.push({
+                id: i,
+                name: nome || "Senza nome",
+                address: indirizzo || "",
+                lat, lon,
+                prices: { Benzina: prezzoBenzina, Diesel: prezzoDiesel, Gpl: prezzoGpl, Metano: prezzoMetano }
+            });
+        }
+        return results;
+    }
+
+    // Caricamento file locale (CSV/JSON)
+    function loadLocalFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            let stationsRaw = [];
+            if (file.name.endsWith('.json')) {
+                try {
+                    const json = JSON.parse(content);
+                    stationsRaw = Array.isArray(json) ? json : [];
+                } catch (err) { alert("JSON non valido"); return; }
+            } else if (file.name.endsWith('.csv')) {
+                stationsRaw = parseMimitCSV(content);
+                if (!stationsRaw.length) { alert("Formato CSV non riconosciuto. Usa il file ufficiale Mimit."); return; }
+            } else { alert("Carica file .csv o .json"); return; }
+
+            if (!currentUserCoords) { alert("Posizione non ancora disponibile. Attendi geolocalizzazione."); return; }
+            const fuel = currentFuel;
+            const enriched = stationsRaw.map(s => {
+                const price = s.prices?.[fuel];
+                if (!price || isNaN(price)) return null;
+                const distance = haversineDistance(currentUserCoords.lat, currentUserCoords.lng, s.lat, s.lon);
+                const score = combinedScore(price, distance);
+                return { ...s, price, distance, score };
+            }).filter(s => s !== null);
+            if (enriched.length) {
+                lastStations = enriched;
+                renderStations(enriched, fuel, `file ${file.name}`);
+            } else {
+                alert(`Nessun distributore con carburante ${fuel} nel file caricato.`);
+            }
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    // -------------------------------
+    // RICERCA PRINCIPALE
+    // -------------------------------
+    async function searchStations() {
+        if (!currentUserCoords) {
+            stationsContainer.innerHTML = `<div class="error-msg">📍 Posizione non disponibile. Attiva geolocalizzazione.</div>`;
+            return;
+        }
+        const fuel = fuelSelect.value;
+        currentFuel = fuel;
+        const range = parseFloat(rangeInput.value);
+        currentRangeKm = isNaN(range) ? 10 : range;
+
+        stationsContainer.innerHTML = `<div class="loading"><span class="loader"></span> Tentativo di contattare l'API Mimit con più proxy...</div>`;
+        dataSourceBadge.innerText = "⏳ tentativo proxy...";
+
+        // Mostra un avviso se siamo in file://
+        if (window.location.protocol === 'file:') {
+            stationsContainer.innerHTML += `<div class="warning-box">
+                ⚠️ <strong>Attenzione:</strong> La pagina è aperta come file locale (file://).<br>
+                I proxy CORS potrebbero non funzionare correttamente. Per testare, carica il file su GitHub Pages o avvia un server locale (es. con Python: <code>python -m http.server 8000</code>).<br>
+                In alternativa, usa il pulsante "Carica file CSV/JSON" con il file ufficiale scaricato.
+            </div>`;
+        }
+
+        try {
+            const { stations, proxyName } = await fetchWithProxyFallback(currentUserCoords.lat, currentUserCoords.lng, currentRangeKm, currentFuel);
+            if (stations.length) {
+                lastStations = stations;
+                renderStations(stations, currentFuel, `Mimit API (proxy: ${proxyName})`);
+                return;
+            } else {
+                throw new Error("Nessun distributore trovato");
+            }
+        } catch (err) {
+            console.error("Tutti i proxy falliti:", err);
+            stationsContainer.innerHTML = `<div class="error-msg">
+                ❌ Impossibile recuperare i dati in tempo reale.<br>
+                🔧 Motivo: ${err.message || "Tutti i proxy CORS hanno fallito."}<br>
+                📥 Puoi comunque usare il file CSV ufficiale: scaricalo dal sito del Mimit (link sotto) e caricalo con il pulsante "Carica file CSV/JSON".<br>
+                💡 <strong>Suggerimento:</strong> Se sei in locale (file://), prova a caricare la pagina su GitHub Pages o avvia un server web locale.
+            </div>`;
+            dataSourceBadge.innerText = "⚠️ API fallita → usa file locale";
+        }
+    }
+
+    // -------------------------------
+    // GEOLOCALIZZAZIONE
+    // -------------------------------
+    function getGeoLocation() {
+        if (!navigator.geolocation) {
+            locTextSpan.innerText = "Geolocalizzazione non supportata";
+            setDefaultPosition();
+            return;
+        }
+        locTextSpan.innerHTML = `<span class="loader"></span> richiesta GPS...`;
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                currentUserCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                locTextSpan.innerHTML = `${currentUserCoords.lat.toFixed(5)}°, ${currentUserCoords.lng.toFixed(5)}° ✅`;
+                stationsContainer.innerHTML = `<div class="loading">📍 Posizione acquisita. Premi "Cerca distributori reali".</div>`;
+            },
+            (err) => {
+                console.warn(err);
+                setDefaultPosition();
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    function setDefaultPosition() {
+        currentUserCoords = { lat: 41.9028, lng: 12.4964 };
+        locTextSpan.innerHTML = `🌐 Default: Roma Centro (41.9028, 12.4964)`;
+        stationsContainer.innerHTML = `<div class="loading">📍 Posizione di default impostata. Premi "Cerca".</div>`;
+    }
+
+    // -------------------------------
+    // EVENTI E INIT
+    // -------------------------------
+    searchBtn.addEventListener("click", searchStations);
+    refreshLocBtn.addEventListener("click", getGeoLocation);
+    manualCsvBtn.addEventListener("click", () => fileUpload.click());
+    fileUpload.addEventListener("change", (e) => {
+        if (e.target.files.length) loadLocalFile(e.target.files[0]);
+        fileUpload.value = "";
+    });
+    fuelSelect.addEventListener("change", () => { if (lastStations.length) searchStations(); });
+    rangeInput.addEventListener("change", () => { if (lastStations.length) searchStations(); });
+
+    getGeoLocation();
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, (m) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
+    }
+</script>
+</body>
+</html>
