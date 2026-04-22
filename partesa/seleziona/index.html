@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Selezione Prodotti - Partesa</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, Helvetica, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 0.25rem;
+            color: #1e466e;
+        }
+        .sub {
+            color: #4a627a;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #ff9800;
+            padding-left: 14px;
+        }
+        .toolbar {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 180px;
+        }
+        .filter-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2c3e66;
+        }
+        select, button, .file-label, .search-input {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .search-input {
+            cursor: text;
+            width: 220px;
+        }
+        .file-label {
+            display: inline-block;
+            background-color: #e9ecef;
+            cursor: pointer;
+        }
+        button {
+            background-color: #1e466e;
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+        button:hover {
+            background-color: #0f2f4f;
+            transform: scale(0.97);
+        }
+        .btn-secondary {
+            background-color: #ff9800;
+            color: #2d2d2d;
+        }
+        .btn-wa {
+            background-color: #25D366;
+        }
+        .btn-wa:hover {
+            background-color: #1da15b;
+        }
+        .btn-email {
+            background-color: #34a853;
+        }
+        .btn-email:hover {
+            background-color: #2c8e47;
+        }
+        .stats {
+            background: #eef2ff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 60vh;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 700px;
+        }
+        th, td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f1f5f9;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+        }
+        .checkbox-col {
+            width: 35px;
+            text-align: center;
+        }
+        tr.selected-row {
+            background-color: #e6f7e6;
+        }
+        .footer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 24px;
+        }
+        .file-input {
+            display: none;
+        }
+        .info-message {
+            margin-top: 12px;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 30px;
+            background: #e6f4ea;
+            color: #137333;
+            display: inline-block;
+        }
+        .error-message {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+        @media (max-width: 700px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📋 Seleziona prodotti dal listino</h1>
+    <div class="sub">Caricamento automatico del file "elenco_prodotti.xlsx". Filtra, seleziona e invia la lista via WhatsApp o Email.</div>
+
+    <div class="toolbar">
+        <div class="filters">
+            <div class="filter-group" style="display: none;">
+                <label>📂 File alternativo (opzionale)</label>
+                <label class="file-label">
+                    📁 Carica altro file
+                    <input type="file" id="uploadExcel" class="file-input" accept=".xlsx, .xls, .csv">
+                </label>
+            </div>
+            <div class="filter-group">
+                <label>🏷️ Categoria (OSS Cat Rag)</label>
+                <select id="filterCategoria">
+                    <option value="">Tutte</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📌 Segmento (OSS Segmento)</label>
+                <select id="filterSegmento">
+                    <option value="">Tutti</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🔍 Cerca (codice/descrizione)</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="es. Moretti, Heineken, 0224T...">
+            </div>
+            <button id="resetFiltersBtn" class="btn-secondary">🔄 Reset filtri</button>
+        </div>
+        <div class="stats" id="stats">Caricamento in corso...</div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th class="checkbox-col">✔</th><th>Cod Art</th><th>Desc Articolo</th><th>Misura</th><th>UDM</th><th>UM</th><th>Categoria</th><th>Segmento</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="8" style="text-align:center">Caricamento del file in corso...<br>Se non vedi i prodotti, assicurati che il file "elenco_prodotti.xlsx" sia presente nella stessa cartella.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-buttons">
+        <button id="selectAllBtn">✅ Seleziona tutti (filtrati)</button>
+        <button id="deselectAllBtn">❌ Deseleziona tutti</button>
+        <button id="exportExcelBtn" class="btn-secondary">📎 Scarica Excel</button>
+        <button id="whatsappTextBtn" class="btn-wa">💬 Invia lista via WhatsApp</button>
+        <button id="emailTextBtn" class="btn-email">✉️ Invia lista via Email</button>
+    </div>
+    <div id="infoMsg"></div>
+</div>
+
+<script>
+    // ---------- Variabili globali ----------
+    let prodotti = [];
+    let filteredIndices = [];
+    let selectedIndices = new Set();
+
+    // DOM
+    const filterCategoria = document.getElementById('filterCategoria');
+    const filterSegmento = document.getElementById('filterSegmento');
+    const searchInput = document.getElementById('searchInput');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+    const whatsappTextBtn = document.getElementById('whatsappTextBtn');
+    const emailTextBtn = document.getElementById('emailTextBtn');
+    const tableBody = document.getElementById('tableBody');
+    const statsSpan = document.getElementById('stats');
+    const infoMsgDiv = document.getElementById('infoMsg');
+    const fileInput = document.getElementById('uploadExcel');
+
+    const WHATSAPP_NUMBER = "393331395730";
+    const EMAIL_TO = "iartservizi@gmail.com";
+
+    // ---------- Utility ----------
+    function showMessage(msg, isError = false) {
+        const div = document.createElement('div');
+        div.className = `info-message ${isError ? 'error-message' : ''}`;
+        div.textContent = msg;
+        infoMsgDiv.innerHTML = '';
+        infoMsgDiv.appendChild(div);
+        setTimeout(() => { if (infoMsgDiv.firstChild === div) infoMsgDiv.innerHTML = ''; }, 5000);
+    }
+
+    // Aggiorna i dropdown in cascata
+    function updateFilterOptions() {
+        const currentCat = filterCategoria.value;
+        const currentSeg = filterSegmento.value;
+
+        let allCategorie = new Set();
+        let allSegmenti = new Set();
+        let catToSeg = new Map();
+        let segToCat = new Map();
+
+        for (const p of prodotti) {
+            const cat = p.categoria || "";
+            const seg = p.segmento || "";
+            if (cat) allCategorie.add(cat);
+            if (seg) allSegmenti.add(seg);
+            if (cat && seg) {
+                if (!catToSeg.has(cat)) catToSeg.set(cat, new Set());
+                catToSeg.get(cat).add(seg);
+                if (!segToCat.has(seg)) segToCat.set(seg, new Set());
+                segToCat.get(seg).add(cat);
+            }
+        }
+
+        let categorieDaMostrare = new Set(allCategorie);
+        if (currentSeg && segToCat.has(currentSeg)) {
+            categorieDaMostrare = segToCat.get(currentSeg);
+        }
+        let catHtml = '<option value="">Tutte</option>';
+        for (let c of [...categorieDaMostrare].sort()) {
+            catHtml += `<option value="${escapeHtml(c)}" ${currentCat === c ? 'selected' : ''}>${escapeHtml(c)}</option>`;
+        }
+        filterCategoria.innerHTML = catHtml;
+
+        let segmentiDaMostrare = new Set(allSegmenti);
+        if (currentCat && catToSeg.has(currentCat)) {
+            segmentiDaMostrare = catToSeg.get(currentCat);
+        }
+        let segHtml = '<option value="">Tutti</option>';
+        for (let s of [...segmentiDaMostrare].sort()) {
+            segHtml += `<option value="${escapeHtml(s)}" ${currentSeg === s ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+        }
+        filterSegmento.innerHTML = segHtml;
+    }
+
+    // Applica tutti i filtri
+    function applyFilters() {
+        const catValue = filterCategoria.value;
+        const segValue = filterSegmento.value;
+        const searchTerm = searchInput.value.trim().toLowerCase();
+
+        filteredIndices = [];
+        for (let i = 0; i < prodotti.length; i++) {
+            const p = prodotti[i];
+            let ok = true;
+            if (catValue && p.categoria !== catValue) ok = false;
+            if (segValue && p.segmento !== segValue) ok = false;
+            if (searchTerm) {
+                const codMatch = (p.codArt || "").toLowerCase().includes(searchTerm);
+                const descMatch = (p.descrizione || "").toLowerCase().includes(searchTerm);
+                if (!codMatch && !descMatch) ok = false;
+            }
+            if (ok) filteredIndices.push(i);
+        }
+        renderTable();
+    }
+
+    // Render tabella
+    function renderTable() {
+        if (!prodotti.length) {
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.</td></tr>';
+            statsSpan.innerText = 'Nessun prodotto';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        for (let idx of filteredIndices) {
+            const p = prodotti[idx];
+            const isSelected = selectedIndices.has(idx);
+            const row = document.createElement('tr');
+            if (isSelected) row.classList.add('selected-row');
+
+            const tdCheck = document.createElement('td');
+            tdCheck.classList.add('checkbox-col');
+            const chk = document.createElement('input');
+            chk.type = 'checkbox';
+            chk.checked = isSelected;
+            chk.addEventListener('change', () => {
+                if (chk.checked) selectedIndices.add(idx);
+                else selectedIndices.delete(idx);
+                renderTable();
+            });
+            tdCheck.appendChild(chk);
+            row.appendChild(tdCheck);
+
+            const tdCod = document.createElement('td'); tdCod.textContent = p.codArt || ''; row.appendChild(tdCod);
+            const tdDesc = document.createElement('td'); tdDesc.textContent = p.descrizione || ''; row.appendChild(tdDesc);
+            const tdMis = document.createElement('td'); tdMis.textContent = p.misura || ''; row.appendChild(tdMis);
+            const tdUdm = document.createElement('td'); tdUdm.textContent = p.udm || ''; row.appendChild(tdUdm);
+            const tdUm = document.createElement('td'); tdUm.textContent = p.um || ''; row.appendChild(tdUm);
+            const tdCat = document.createElement('td'); tdCat.textContent = p.categoria || ''; row.appendChild(tdCat);
+            const tdSeg = document.createElement('td'); tdSeg.textContent = p.segmento || ''; row.appendChild(tdSeg);
+
+            fragment.appendChild(row);
+        }
+        tableBody.innerHTML = '';
+        tableBody.appendChild(fragment);
+
+        const totalFiltered = filteredIndices.length;
+        let selectedCount = 0;
+        for (let idx of selectedIndices) if (filteredIndices.includes(idx)) selectedCount++;
+        statsSpan.innerHTML = `📊 Mostrati ${totalFiltered} prodotti — ✅ Selezionati ${selectedCount} (su ${prodotti.length} totali)`;
+    }
+
+    function selectAllFiltered() {
+        for (let idx of filteredIndices) selectedIndices.add(idx);
+        renderTable();
+    }
+    function deselectAll() {
+        selectedIndices.clear();
+        renderTable();
+    }
+
+    function resetFilters() {
+        filterCategoria.value = "";
+        filterSegmento.value = "";
+        searchInput.value = "";
+        updateFilterOptions();
+        applyFilters();
+        showMessage("Filtri resettati.");
+    }
+
+    function getSelectedText() {
+        if (selectedIndices.size === 0) {
+            alert("Nessun prodotto selezionato.");
+            return null;
+        }
+        let lines = [];
+        for (let idx of selectedIndices) {
+            const p = prodotti[idx];
+            lines.push(`${p.codArt}\t${p.descrizione}`);
+        }
+        return lines.join("\n");
+    }
+
+    function shareTextWhatsApp() {
+        const text = getSelectedText();
+        if (!text) return;
+        const encoded = encodeURIComponent(text);
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
+        showMessage("📱 WhatsApp aperto. Invia il messaggio precompilato.");
+    }
+
+    function shareTextEmail() {
+        const text = getSelectedText();
+        if (!text) return;
+        const subject = encodeURIComponent("Prodotti selezionati da listino");
+        const body = encodeURIComponent("Elenco prodotti (codice + descrizione, separati da tab):\n\n" + text);
+        window.location.href = `mailto:${EMAIL_TO}?subject=${subject}&body=${body}`;
+        showMessage("✉️ Client email aperto. Invia il messaggio.");
+    }
+
+    function downloadExcel() {
+        if (selectedIndices.size === 0) {
+            alert("Nessun prodotto selezionato.");
+            return;
+        }
+        const rows = [["OSS Cat Rag", "OSS Segmento", "Prodotti selez.", "Cod Art", "Desc Articolo", "Misura", "UDM", "UM"]];
+        for (let idx of selectedIndices) {
+            const p = prodotti[idx];
+            rows.push([
+                p.categoria || "",
+                p.segmento || "",
+                "",
+                p.codArt || "",
+                p.descrizione || "",
+                p.misura || "",
+                p.udm || "",
+                p.um || ""
+            ]);
+        }
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{wch:15},{wch:20},{wch:12},{wch:12},{wch:40},{wch:10},{wch:8},{wch:8}];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Prodotti_selezionati");
+        XLSX.writeFile(wb, `prodotti_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        showMessage("✅ File Excel scaricato.");
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+
+    // ---------- Caricamento automatico del file "elenco_prodotti.xlsx" ----------
+    function loadDefaultFile() {
+        statsSpan.innerText = "Caricamento in corso...";
+        fetch('elenco_prodotti.xlsx')
+            .then(response => {
+                if (!response.ok) throw new Error(`File non trovato (${response.status})`);
+                return response.arrayBuffer();
+            })
+            .then(data => {
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+                if (!rows || rows.length < 2) throw new Error("File vuoto o non valido.");
+                
+                let headerIndex = -1;
+                for (let i = 0; i < Math.min(rows.length, 15); i++) {
+                    if (rows[i] && rows[i][0] === "OSS Cat Rag") {
+                        headerIndex = i;
+                        break;
+                    }
+                }
+                if (headerIndex === -1) throw new Error("Intestazione non trovata.");
+                
+                const headers = rows[headerIndex];
+                const colIdx = { categoria: -1, segmento: -1, codArt: -1, descrizione: -1, misura: -1, udm: -1, um: -1 };
+                for (let i = 0; i < headers.length; i++) {
+                    const h = headers[i] ? headers[i].toString().trim() : "";
+                    if (h === "OSS Cat Rag") colIdx.categoria = i;
+                    else if (h === "OSS Segmento") colIdx.segmento = i;
+                    else if (h === "Cod Art") colIdx.codArt = i;
+                    else if (h === "Desc Articolo") colIdx.descrizione = i;
+                    else if (h === "Misura") colIdx.misura = i;
+                    else if (h === "UDM") colIdx.udm = i;
+                    else if (h === "UM") colIdx.um = i;
+                }
+                if (colIdx.codArt === -1 || colIdx.descrizione === -1) throw new Error("Colonne 'Cod Art' e/o 'Desc Articolo' non trovate.");
+                
+                const prodottiTemp = [];
+                for (let i = headerIndex + 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0 || row.every(cell => cell === undefined || cell === "")) continue;
+                    const cod = (colIdx.codArt !== -1 && row[colIdx.codArt]) ? row[colIdx.codArt].toString().trim() : "";
+                    if (cod === "") continue;
+                    prodottiTemp.push({
+                        categoria: (colIdx.categoria !== -1 && row[colIdx.categoria]) ? row[colIdx.categoria].toString().trim() : "",
+                        segmento: (colIdx.segmento !== -1 && row[colIdx.segmento]) ? row[colIdx.segmento].toString().trim() : "",
+                        codArt: cod,
+                        descrizione: (colIdx.descrizione !== -1 && row[colIdx.descrizione]) ? row[colIdx.descrizione].toString().trim() : "",
+                        misura: (colIdx.misura !== -1 && row[colIdx.misura]) ? row[colIdx.misura].toString().trim() : "",
+                        udm: (colIdx.udm !== -1 && row[colIdx.udm]) ? row[colIdx.udm].toString().trim() : "",
+                        um: (colIdx.um !== -1 && row[colIdx.um]) ? row[colIdx.um].toString().trim() : ""
+                    });
+                }
+                if (prodottiTemp.length === 0) throw new Error("Nessun prodotto valido nel file.");
+                
+                prodotti = prodottiTemp;
+                selectedIndices.clear();
+                filterCategoria.value = "";
+                filterSegmento.value = "";
+                searchInput.value = "";
+                updateFilterOptions();
+                applyFilters();
+                showMessage(`✅ Caricati ${prodotti.length} prodotti da "elenco_prodotti.xlsx".`);
+            })
+            .catch(error => {
+                console.error(error);
+                statsSpan.innerText = "Errore caricamento";
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">⚠️ Impossibile caricare "elenco_prodotti.xlsx". Assicurati che il file esista nella stessa cartella della pagina.<br>In alternativa, puoi caricare manualmente un file Excel usando il pulsante qui sotto.</td></tr>`;
+                showMessage("File predefinito non trovato. Carica manualmente un file Excel.", true);
+                // Mostra il selettore file come opzione di fallback
+                document.querySelector('.filter-group[style*="display: none;"]').style.display = "flex";
+            });
+    }
+
+    // Caricamento manuale alternativo
+    function handleManualUpload(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+            if (!rows || rows.length < 2) { alert("File vuoto o non valido."); return; }
+            let headerIndex = -1;
+            for (let i = 0; i < Math.min(rows.length, 15); i++) {
+                if (rows[i] && rows[i][0] === "OSS Cat Rag") { headerIndex = i; break; }
+            }
+            if (headerIndex === -1) { alert("Intestazione non trovata."); return; }
+            const headers = rows[headerIndex];
+            const colIdx = { categoria: -1, segmento: -1, codArt: -1, descrizione: -1, misura: -1, udm: -1, um: -1 };
+            for (let i = 0; i < headers.length; i++) {
+                const h = headers[i] ? headers[i].toString().trim() : "";
+                if (h === "OSS Cat Rag") colIdx.categoria = i;
+                else if (h === "OSS Segmento") colIdx.segmento = i;
+                else if (h === "Cod Art") colIdx.codArt = i;
+                else if (h === "Desc Articolo") colIdx.descrizione = i;
+                else if (h === "Misura") colIdx.misura = i;
+                else if (h === "UDM") colIdx.udm = i;
+                else if (h === "UM") colIdx.um = i;
+            }
+            if (colIdx.codArt === -1 || colIdx.descrizione === -1) { alert("Colonne 'Cod Art' e/o 'Desc Articolo' non trovate."); return; }
+            const prodottiTemp = [];
+            for (let i = headerIndex + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length === 0 || row.every(cell => cell === undefined || cell === "")) continue;
+                const cod = (colIdx.codArt !== -1 && row[colIdx.codArt]) ? row[colIdx.codArt].toString().trim() : "";
+                if (cod === "") continue;
+                prodottiTemp.push({
+                    categoria: (colIdx.categoria !== -1 && row[colIdx.categoria]) ? row[colIdx.categoria].toString().trim() : "",
+                    segmento: (colIdx.segmento !== -1 && row[colIdx.segmento]) ? row[colIdx.segmento].toString().trim() : "",
+                    codArt: cod,
+                    descrizione: (colIdx.descrizione !== -1 && row[colIdx.descrizione]) ? row[colIdx.descrizione].toString().trim() : "",
+                    misura: (colIdx.misura !== -1 && row[colIdx.misura]) ? row[colIdx.misura].toString().trim() : "",
+                    udm: (colIdx.udm !== -1 && row[colIdx.udm]) ? row[colIdx.udm].toString().trim() : "",
+                    um: (colIdx.um !== -1 && row[colIdx.um]) ? row[colIdx.um].toString().trim() : ""
+                });
+            }
+            if (prodottiTemp.length === 0) { alert("Nessun prodotto valido."); return; }
+            prodotti = prodottiTemp;
+            selectedIndices.clear();
+            filterCategoria.value = "";
+            filterSegmento.value = "";
+            searchInput.value = "";
+            updateFilterOptions();
+            applyFilters();
+            showMessage(`✅ Caricati ${prodotti.length} prodotti da file selezionato manualmente.`);
+        };
+        reader.onerror = () => alert("Errore lettura file.");
+        reader.readAsArrayBuffer(file);
+    }
+
+    // Event listeners
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleManualUpload(e.target.files[0]);
+    });
+    filterCategoria.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
+    filterSegmento.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
+    searchInput.addEventListener('input', applyFilters);
+    resetBtn.addEventListener('click', resetFilters);
+    selectAllBtn.addEventListener('click', selectAllFiltered);
+    deselectAllBtn.addEventListener('click', deselectAll);
+    exportExcelBtn.addEventListener('click', downloadExcel);
+    whatsappTextBtn.addEventListener('click', shareTextWhatsApp);
+    emailTextBtn.addEventListener('click', shareTextEmail);
+
+    // Avvio: carica il file predefinito
+    loadDefaultFile();
+</script>
+</body>
+</html>
