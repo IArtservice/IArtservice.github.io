@@ -39,7 +39,7 @@
             z-index: -1;
             background: url('almaneggio_sfondo.jpg') no-repeat center center;
             background-size: contain;
-            filter: blur(3px);
+            filter: blur(2px);  /* ridotta sfocatura (prima era 3px) */
             transition: background-image 0.5s ease;
         }
 
@@ -146,7 +146,7 @@
         /* ----- Intestazione ristorante con sfondo sfumato per il titolo ----- */
         .restaurant-header {
             text-align: center;
-            margin: 30px 0 50px;
+            margin: 80px 0 50px;  /* aumentato margine superiore per non coprire il logo */
             padding-bottom: 25px;
             border-bottom: 1px solid rgba(200, 160, 80, 0.5);
         }
@@ -313,7 +313,7 @@
             text-shadow: 0 1px 2px rgba(255,255,240,0.8);
         }
 
-        /* Crediti IArt – ora molto più visibili */
+        /* Crediti IArt – logo più grande e staccato dallo sfondo */
         .credit {
             margin-top: 25px;
             display: flex;
@@ -347,10 +347,11 @@
             transform: scale(1.03);
         }
         .credit img {
-            height: 28px;
+            height: 38px;  /* ingrandito (prima era 28px) */
             width: auto;
             display: block;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            margin: -5px 0; /* per staccarlo leggermente dallo sfondo del link */
         }
 
         @media (max-width: 750px) {
@@ -365,7 +366,8 @@
             .fixed-logo img { width: 40px; }
             .lang-btn { top: 12px; right: 12px; width: 42px; height: 42px; font-size: 1.3rem; }
             .credit a { padding: 8px 16px; font-size: 0.75rem; }
-            .credit img { height: 22px; }
+            .credit img { height: 30px; }
+            .restaurant-header { margin-top: 60px; }  /* ridotto margine su mobile */
         }
     </style>
 </head>
