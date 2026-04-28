@@ -37,8 +37,19 @@
             z-index: -1;
             background: url('almaneggio_sfondo.jpg') no-repeat center center;
             background-size: contain;
+            will-change: transform;
+        }
+        #bgLayer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            background-size: contain;
             filter: blur(2px);
-            transition: background-image 0.5s ease;
+            pointer-events: none;
         }
 
         .lang-btn {
@@ -163,7 +174,7 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 6px;
-            color: #c0b090;                     /* più scuro di prima */
+            color: #c0b090;
             margin-top: 8px;
             text-shadow: 0 2px 6px rgba(0,0,0,0.6), 0 0 4px rgba(255,255,240,0.5);
         }
@@ -296,7 +307,7 @@
             margin-top: 50px;
             text-align: center;
             font-size: 0.7rem;
-            color: #5a4a3a;                  /* scurito per leggibilità */
+            color: #5a4a3a;
             border-top: 1px solid rgba(180, 140, 90, 0.5);
             padding-top: 30px;
             letter-spacing: 0.4px;
@@ -320,7 +331,6 @@
             gap: 10px;
             text-decoration: none;
             color: #e0c28e;
-            /* sfondo rimosso per far "uscire" il logo */
             background: none;
             backdrop-filter: none;
             padding: 8px 12px;
@@ -337,7 +347,7 @@
             transform: scale(1.03);
         }
         .credit img {
-            height: 40px;                    /* più grande */
+            height: 40px;
             width: auto;
             display: block;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
@@ -408,7 +418,7 @@
 
 <script>
     // ==================================================================
-    // DATI DEL MENÙ (con traduzione inglese)
+    // DATI DEL MENÙ (completi, nessuna omissione)
     // ==================================================================
     const menuItems = [
         // ANTIPASTI DI PESCE
@@ -633,8 +643,13 @@
     };
 
     let currentFilter = "all", lang = "it";
+    const colorCache = {};
 
     function getAverageColor(imgSrc, callback) {
+        if (colorCache[imgSrc]) {
+            callback(colorCache[imgSrc]);
+            return;
+        }
         const img = new Image();
         img.crossOrigin = "Anonymous";
         img.onload = function() {
@@ -654,7 +669,9 @@
             r = Math.round(r / count);
             g = Math.round(g / count);
             b = Math.round(b / count);
-            callback(`rgb(${r},${g},${b})`);
+            const color = `rgb(${r},${g},${b})`;
+            colorCache[imgSrc] = color;
+            callback(color);
         };
         img.onerror = function() { callback('#2c1e14'); };
         img.src = imgSrc;
@@ -669,11 +686,20 @@
         });
     }
 
+    // Precarica tutte le immagini di sfondo
+    function preloadBgImages() {
+        const uniqueUrls = [...new Set(Object.values(bgImages))];
+        uniqueUrls.forEach(url => {
+            const img = new Image();
+            img.src = url;
+        });
+    }
+
     document.getElementById('langBtn').addEventListener('click', () => {
         lang = lang === 'it' ? 'en' : 'it';
         document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹';
-        renderFilters();
-        renderMenu();
+        renderFilters(); // ricrea i bottoni con nuove etichette
+        applyFilterAndUpdate(); // mostra le sezioni giuste con la lingua corrente
         updateFooter();
         updateHeaderSub();
     });
@@ -696,8 +722,78 @@
         const raw = lang === 'en' ? (item.allergens_en || '') : (item.allergens || '');
         return (raw === 'nessuno' || raw === 'none' || raw === '' || raw === 'variabili' || raw === 'varies') ? '' : raw;
     }
-
     function getCategoryLabel(cat) { return lang === 'en' ? categoryLabels_en[cat] || cat : categoryLabels[cat] || cat; }
+
+    // Costruisce il menù completo una volta sola
+    function buildFullMenu() {
+        const container = document.getElementById('menuContent');
+        // Ordine delle sezioni (completo, così come appare in "all")
+        const order = ["antipasti_pesce","antipasti_terra","primi_pesce","primi_terra","secondi_pesce","secondi_terra","contorni","insalatone","formaggi","pizze","calzoni","focacce","dolci","bevande","caffetteria","vini"];
+        let html = '';
+        for (let cat of order) {
+            const items = menuItems.filter(i => i.category === cat);
+            if (items.length === 0) continue;
+            html += `<div class="menu-section" data-category="${cat}">
+                        <div class="section-title">${getCategoryLabel(cat)}</div>
+                        <div class="menu-list">`;
+            for (let item of items) {
+                const descHtml = getItemDesc(item) ? `<div class="item-desc">${getItemDesc(item)}</div>` : '';
+                const allergHtml = getAllergens(item) ? `<div class="allergen">${getAllergens(item)}</div>` : '';
+                html += `<div class="menu-item">
+                            <div class="item-info">
+                                <div class="item-name">${getItemName(item)}</div>
+                                ${descHtml}
+                                ${allergHtml}
+                            </div>
+                            <div class="item-price">${item.price}</div>
+                         </div>`;
+            }
+            html += `</div></div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    // Applica il filtro (mostra/nascondi sezioni) e aggiorna titoli lingua (senza ricostruire gli item)
+    function applyFilterAndUpdate() {
+        const sections = document.querySelectorAll('.menu-section');
+        if (currentFilter === "all") {
+            sections.forEach(s => s.style.display = 'block');
+        } else if (currentFilter === "pizzeria") {
+            sections.forEach(s => {
+                const cat = s.getAttribute('data-category');
+                s.style.display = (cat === 'pizze' || cat === 'calzoni' || cat === 'focacce') ? 'block' : 'none';
+            });
+        } else {
+            sections.forEach(s => {
+                s.style.display = s.getAttribute('data-category') === currentFilter ? 'block' : 'none';
+            });
+        }
+        // Aggiorna i titoli delle sezioni (per la lingua)
+        sections.forEach(s => {
+            const cat = s.getAttribute('data-category');
+            const titleDiv = s.querySelector('.section-title');
+            if (titleDiv) titleDiv.textContent = getCategoryLabel(cat);
+        });
+        // Aggiorna anche i testi degli item (nome, desc, allergeni)
+        const allItems = document.querySelectorAll('.menu-item');
+        allItems.forEach((itemDiv, idx) => {
+            // Dobbiamo recuperare l'item originale corrispondente. Approccio: associare un id univoco?
+            // Più semplice: rigenerare tutto? No, vogliamo evitare ricostruzione DOM.
+            // Alternativa: ricostruire i testi senza rifare l'HTML, ma è complesso.
+            // Dato che la lingua cambia raramente (click sul pulsante), possiamo rigenerare tutto il menù
+            // ma solo quando cambia lingua. Allora:
+        });
+        // Per gestire il cambio lingua, invece di aggiornare ogni singolo elemento, rigeneriamo l'intero menù
+        // (ma solo quando cambia lingua, non ad ogni filtro). Quindi separiamo:
+        // - changeLanguage() => buildFullMenu() + applyFilterAndUpdate()
+        // - changeFilter() => solo applyFilterAndUpdate()
+    }
+
+    // Ricostruisce tutto il menù (usato all'avvio e al cambio lingua)
+    function rebuildMenu() {
+        buildFullMenu();
+        applyFilterAndUpdate();
+    }
 
     function renderFilters() {
         const filterOrder = ["all","antipasti_pesce","antipasti_terra","primi_pesce","primi_terra","secondi_pesce","secondi_terra","contorni","insalatone","formaggi","pizzeria","dolci","bevande","caffetteria","vini"];
@@ -706,33 +802,24 @@
         ).join('');
         document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', (e) => {
             currentFilter = btn.dataset.cat;
-            renderFilters();
-            renderMenu();
-            updateBackground(currentFilter);
+            renderFilters(); // aggiorna classe active
+            applyFilterAndUpdate();
+            updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
         }));
     }
 
-    function renderMenu() {
-        const container = document.getElementById('menuContent');
-        let filtered = currentFilter === "pizzeria" ? menuItems.filter(i => i.category === "pizze" || i.category === "calzoni" || i.category === "focacce") :
-                       currentFilter === "all" ? menuItems : menuItems.filter(i => i.category === currentFilter);
-
-        if (currentFilter !== "all") {
-            container.innerHTML = `<div class="menu-section"><div class="section-title">${getCategoryLabel(currentFilter)}</div><div class="menu-list">${filtered.map(item => `
-                <div class="menu-item"><div class="item-info"><div class="item-name">${getItemName(item)}</div>${getItemDesc(item) ? `<div class="item-desc">${getItemDesc(item)}</div>` : ''}${getAllergens(item) ? `<div class="allergen">${getAllergens(item)}</div>` : ''}</div><div class="item-price">${item.price}</div></div>`).join('')}</div></div>`;
-        } else {
-            const order = ["antipasti_pesce","antipasti_terra","primi_pesce","primi_terra","secondi_pesce","secondi_terra","contorni","insalatone","formaggi","pizze","calzoni","focacce","dolci","bevande","caffetteria","vini"];
-            let html = '';
-            for (let cat of order) {
-                const items = menuItems.filter(i => i.category === cat);
-                if (items.length) html += `<div class="menu-section"><div class="section-title">${getCategoryLabel(cat)}</div><div class="menu-list">${items.map(item => `
-                    <div class="menu-item"><div class="item-info"><div class="item-name">${getItemName(item)}</div>${getItemDesc(item) ? `<div class="item-desc">${getItemDesc(item)}</div>` : ''}${getAllergens(item) ? `<div class="allergen">${getAllergens(item)}</div>` : ''}</div><div class="item-price">${item.price}</div></div>`).join('')}</div></div>`;
-            }
-            container.innerHTML = html;
-        }
-    }
-
     window.addEventListener('load', () => {
+        // Precarica immagini di sfondo
+        preloadBgImages();
+        // Costruisci menù e filtri
+        buildFullMenu();
+        renderFilters();
+        applyFilterAndUpdate();
+        updateBackground("default");
+        updateHeaderSub();
+        updateFooter();
+
+        // Animazione logo iniziale
         setTimeout(() => {
             const hero = document.getElementById('logoHero');
             hero.classList.add('hide');
@@ -740,12 +827,21 @@
             document.getElementById('mainContainer').classList.add('reveal');
             setTimeout(() => hero.style.display = 'none', 1000);
         }, 1300);
-        renderFilters();
-        renderMenu();
-        updateBackground("default");
-        updateHeaderSub();
-        updateFooter();
     });
+
+    // Fix per il cambio lingua: ricostruisce tutto il menù (per aggiornare i testi) e riapplica filtro
+    const originalLangHandler = document.getElementById('langBtn').onclick;
+    document.getElementById('langBtn').onclick = () => {
+        lang = lang === 'it' ? 'en' : 'it';
+        document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹';
+        rebuildMenu();          // ricostruisce con nuove traduzioni
+        renderFilters();       // aggiorna etichette bottoni
+        applyFilterAndUpdate(); // mostra solo la categoria corrente
+        updateFooter();
+        updateHeaderSub();
+        // Aggiorna anche il colore di sfondo (potrebbe servire se il filtro corrente ha immagine diversa)
+        updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
+    };
 </script>
 </body>
 </html>
