@@ -418,7 +418,7 @@
 
 <script>
     // ==================================================================
-    // DATI DEL MENÙ (completi, nessuna omissione)
+    // DATI DEL MENÙ (COMPLETI - NESSUN PIATTO OMESSO)
     // ==================================================================
     const menuItems = [
         // ANTIPASTI DI PESCE
@@ -679,30 +679,16 @@
 
     function updateBackground(cat) {
         const url = bgImages[cat] || bgImages["default"];
-        const bgLayer = document.getElementById('bgLayer');
-        bgLayer.style.backgroundImage = `url('${url}')`;
+        document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
         getAverageColor(url, (color) => {
             document.getElementById('bgColor').style.backgroundColor = color;
         });
     }
 
-    // Precarica tutte le immagini di sfondo
     function preloadBgImages() {
         const uniqueUrls = [...new Set(Object.values(bgImages))];
-        uniqueUrls.forEach(url => {
-            const img = new Image();
-            img.src = url;
-        });
+        uniqueUrls.forEach(url => { const img = new Image(); img.src = url; });
     }
-
-    document.getElementById('langBtn').addEventListener('click', () => {
-        lang = lang === 'it' ? 'en' : 'it';
-        document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹';
-        renderFilters(); // ricrea i bottoni con nuove etichette
-        applyFilterAndUpdate(); // mostra le sezioni giuste con la lingua corrente
-        updateFooter();
-        updateHeaderSub();
-    });
 
     function updateHeaderSub() {
         document.getElementById('headerSub').innerHTML = lang === 'en' ?
@@ -724,10 +710,8 @@
     }
     function getCategoryLabel(cat) { return lang === 'en' ? categoryLabels_en[cat] || cat : categoryLabels[cat] || cat; }
 
-    // Costruisce il menù completo una volta sola
     function buildFullMenu() {
         const container = document.getElementById('menuContent');
-        // Ordine delle sezioni (completo, così come appare in "all")
         const order = ["antipasti_pesce","antipasti_terra","primi_pesce","primi_terra","secondi_pesce","secondi_terra","contorni","insalatone","formaggi","pizze","calzoni","focacce","dolci","bevande","caffetteria","vini"];
         let html = '';
         for (let cat of order) {
@@ -753,7 +737,6 @@
         container.innerHTML = html;
     }
 
-    // Applica il filtro (mostra/nascondi sezioni) e aggiorna titoli lingua (senza ricostruire gli item)
     function applyFilterAndUpdate() {
         const sections = document.querySelectorAll('.menu-section');
         if (currentFilter === "all") {
@@ -768,28 +751,14 @@
                 s.style.display = s.getAttribute('data-category') === currentFilter ? 'block' : 'none';
             });
         }
-        // Aggiorna i titoli delle sezioni (per la lingua)
+        // Aggiorna i titoli delle sezioni (per cambio lingua)
         sections.forEach(s => {
             const cat = s.getAttribute('data-category');
             const titleDiv = s.querySelector('.section-title');
             if (titleDiv) titleDiv.textContent = getCategoryLabel(cat);
         });
-        // Aggiorna anche i testi degli item (nome, desc, allergeni)
-        const allItems = document.querySelectorAll('.menu-item');
-        allItems.forEach((itemDiv, idx) => {
-            // Dobbiamo recuperare l'item originale corrispondente. Approccio: associare un id univoco?
-            // Più semplice: rigenerare tutto? No, vogliamo evitare ricostruzione DOM.
-            // Alternativa: ricostruire i testi senza rifare l'HTML, ma è complesso.
-            // Dato che la lingua cambia raramente (click sul pulsante), possiamo rigenerare tutto il menù
-            // ma solo quando cambia lingua. Allora:
-        });
-        // Per gestire il cambio lingua, invece di aggiornare ogni singolo elemento, rigeneriamo l'intero menù
-        // (ma solo quando cambia lingua, non ad ogni filtro). Quindi separiamo:
-        // - changeLanguage() => buildFullMenu() + applyFilterAndUpdate()
-        // - changeFilter() => solo applyFilterAndUpdate()
     }
 
-    // Ricostruisce tutto il menù (usato all'avvio e al cambio lingua)
     function rebuildMenu() {
         buildFullMenu();
         applyFilterAndUpdate();
@@ -802,16 +771,25 @@
         ).join('');
         document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', (e) => {
             currentFilter = btn.dataset.cat;
-            renderFilters(); // aggiorna classe active
+            renderFilters();
             applyFilterAndUpdate();
             updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
         }));
     }
 
+    // Unico gestore della lingua
+    document.getElementById('langBtn').onclick = () => {
+        lang = lang === 'it' ? 'en' : 'it';
+        document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹';
+        rebuildMenu();          // ricostruisce l'intero menù con le nuove traduzioni
+        renderFilters();       // rigenera i bottoni con le nuove etichette
+        updateFooter();
+        updateHeaderSub();
+        updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
+    };
+
     window.addEventListener('load', () => {
-        // Precarica immagini di sfondo
         preloadBgImages();
-        // Costruisci menù e filtri
         buildFullMenu();
         renderFilters();
         applyFilterAndUpdate();
@@ -819,7 +797,6 @@
         updateHeaderSub();
         updateFooter();
 
-        // Animazione logo iniziale
         setTimeout(() => {
             const hero = document.getElementById('logoHero');
             hero.classList.add('hide');
@@ -828,20 +805,6 @@
             setTimeout(() => hero.style.display = 'none', 1000);
         }, 1300);
     });
-
-    // Fix per il cambio lingua: ricostruisce tutto il menù (per aggiornare i testi) e riapplica filtro
-    const originalLangHandler = document.getElementById('langBtn').onclick;
-    document.getElementById('langBtn').onclick = () => {
-        lang = lang === 'it' ? 'en' : 'it';
-        document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹';
-        rebuildMenu();          // ricostruisce con nuove traduzioni
-        renderFilters();       // aggiorna etichette bottoni
-        applyFilterAndUpdate(); // mostra solo la categoria corrente
-        updateFooter();
-        updateHeaderSub();
-        // Aggiorna anche il colore di sfondo (potrebbe servire se il filtro corrente ha immagine diversa)
-        updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
-    };
 </script>
 </body>
 </html>
