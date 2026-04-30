@@ -247,6 +247,21 @@
             text-shadow: 0 1px 4px rgba(255,255,245,0.8), 0 0 6px rgba(0,0,0,0.2);
         }
 
+        .wine-subsection {
+            margin-bottom: 35px;
+        }
+        .wine-subheading {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 20px 0 16px 8px;
+            color: #4a3724;
+            border-bottom: 1px dashed #b48b5a;
+            display: inline-block;
+            padding-right: 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(255,255,245,0.8);
+        }
+
         .menu-list {
             display: flex;
             flex-direction: column;
@@ -367,6 +382,7 @@
             .credit a { padding: 6px 10px; font-size: 0.75rem; }
             .credit img { height: 32px; }
             .restaurant-header { margin-top: 60px; }
+            .wine-subheading { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -418,10 +434,10 @@
 
 <script>
     // ==================================================================
-    // DATI DEL MENÙ (COMPLETI - NESSUN PIATTO OMESSO)
+    // MENU COMPLETO - CARTA VINI CORRETTA CON SUDDIVISIONE (BOLLICINE, BIANCHI, ROSATI, ROSSI, DOLCI)
     // ==================================================================
     const menuItems = [
-        // ANTIPASTI DI PESCE
+        // ANTIPASTI DI PESCE (invariati)
         { name: "Ostriche", name_en: "Oysters", desc: "2 a porzione", desc_en: "2 per serving", price: "€10,00", category: "antipasti_pesce", allergens: "molluschi", allergens_en: "shellfish" },
         { name: "Capesante gratinate", name_en: "Gratinated scallops", desc: "2 a porzione", desc_en: "2 per serving", price: "€10,00", category: "antipasti_pesce", allergens: "molluschi, lattosio", allergens_en: "shellfish, lactose" },
         { name: "Cocktail di gamberetti", name_en: "Prawn cocktail", desc: "", desc_en: "", price: "€12,00", category: "antipasti_pesce", allergens: "crostacei, uova", allergens_en: "crustaceans, eggs" },
@@ -484,28 +500,24 @@
         { name: "Filetto ai funghi porcini", name_en: "Porcini mushroom fillet", desc: "", desc_en: "", price: "€30,00", category: "secondi_terra", allergens: "nessuno", allergens_en: "none" },
         { name: "Grigliata mista (terra)", name_en: "Mixed grilled meat", desc: "costata, petto di pollo, salamella, nodino di maiale", desc_en: "rib-eye, chicken breast, sausage, pork chop", price: "€30,00", category: "secondi_terra", allergens: "nessuno", allergens_en: "none" },
 
-        // CONTORNI
+        // CONTORNI, INSALATONE, FORMAGGI (invariati)
         { name: "Insalata mista", name_en: "Mixed salad", desc: "", desc_en: "", price: "€4,00", category: "contorni", allergens: "nessuno", allergens_en: "none" },
         { name: "Patatine fritte o lesse", name_en: "French fries or boiled potatoes", desc: "", desc_en: "", price: "€4,00", category: "contorni", allergens: "nessuno", allergens_en: "none" },
         { name: "Spinaci al burro o al naturale", name_en: "Buttered or plain spinach", desc: "", desc_en: "", price: "€4,00", category: "contorni", allergens: "lattosio (se al burro)", allergens_en: "lactose (if buttered)" },
         { name: "Verdure grigliate", name_en: "Grilled vegetables", desc: "", desc_en: "", price: "€5,00", category: "contorni", allergens: "nessuno", allergens_en: "none" },
         { name: "Trevisana alla griglia", name_en: "Grilled trevisana radicchio", desc: "", desc_en: "", price: "€5,00", category: "contorni", allergens: "nessuno", allergens_en: "none" },
         { name: "Asparagi gratinati", name_en: "Gratinated asparagus", desc: "", desc_en: "", price: "€6,00", category: "contorni", allergens: "lattosio", allergens_en: "lactose" },
-
-        // INSALATONE
         { name: "Insalata mista con mais, olive, fior di latte e prosciutto cotto", name_en: "Mixed salad with corn, olives, fior di latte and cooked ham", desc: "", desc_en: "", price: "€10,00", category: "insalatone", allergens: "lattosio", allergens_en: "lactose" },
         { name: "Insalata mista con mais, pomodorini, tonno e bufala", name_en: "Mixed salad with corn, cherry tomatoes, tuna and buffalo mozzarella", desc: "", desc_en: "", price: "€10,00", category: "insalatone", allergens: "lattosio, pesce", allergens_en: "lactose, fish" },
         { name: "Insalata mista con mais, gamberetti e tonno", name_en: "Mixed salad with corn, shrimps and tuna", desc: "", desc_en: "", price: "€10,00", category: "insalatone", allergens: "crostacei, pesce", allergens_en: "crustaceans, fish" },
         { name: "Insalata mista con mais, uovo sodo, bresaola, fior di latte e grana a scaglie", name_en: "Mixed salad with corn, boiled egg, bresaola, fior di latte and grana flakes", desc: "", desc_en: "", price: "€10,00", category: "insalatone", allergens: "uova, lattosio", allergens_en: "eggs, lactose" },
         { name: "Insalata mista con mais, rucola, polpa di granchio, limone e grana a scaglie", name_en: "Mixed salad with corn, rocket, crab meat, lemon and grana flakes", desc: "", desc_en: "", price: "€10,00", category: "insalatone", allergens: "crostacei, lattosio", allergens_en: "crustaceans, lactose" },
-
-        // FORMAGGI
         { name: "Grana padano stagionato 12 mesi", name_en: "12-month-aged Grana Padano", desc: "presenza di lattosio, uovo", desc_en: "contains lactose, egg", price: "€5,00", category: "formaggi", allergens: "lattosio, uova", allergens_en: "lactose, eggs" },
         { name: "Gorgonzola dolce", name_en: "Sweet Gorgonzola", desc: "presenza di lattosio", desc_en: "contains lactose", price: "€5,00", category: "formaggi", allergens: "lattosio", allergens_en: "lactose" },
         { name: "Taleggio", name_en: "Taleggio", desc: "presenza di lattosio", desc_en: "contains lactose", price: "€5,00", category: "formaggi", allergens: "lattosio", allergens_en: "lactose" },
         { name: "Scamorza alla griglia", name_en: "Grilled scamorza", desc: "presenza di lattosio", desc_en: "contains lactose", price: "€6,00", category: "formaggi", allergens: "lattosio", allergens_en: "lactose" },
 
-        // PIZZE
+        // PIZZE, CALZONI, FOCACCE (invariati)
         { name: "Margherita", name_en: "Margherita", desc: "pomodoro, mozzarella e basilico", desc_en: "tomato, mozzarella and basil", price: "€8,00", category: "pizze", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Marinara", name_en: "Marinara", desc: "doppio pomodoro, aglio e origano", desc_en: "double tomato, garlic and oregano", price: "€7,00", category: "pizze", allergens: "glutine", allergens_en: "gluten" },
         { name: "4 stagioni", name_en: "Four seasons", desc: "pomodoro, mozzarella, carciofi, prosciutto, funghi e olive", desc_en: "tomato, mozzarella, artichokes, ham, mushrooms and olives", price: "€10,00", category: "pizze", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
@@ -530,15 +542,11 @@
         { name: "Tilitti", name_en: "Tilitti", desc: "pomodoro, mozzarella, scamorza, funghi porcini e basilico", desc_en: "tomato, mozzarella, scamorza, porcini mushrooms and basil", price: "€11,00", category: "pizze", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Dal Pastore", name_en: "Dal Pastore", desc: "pomodoro, mozzarella, salame piccante e ricotta", desc_en: "tomato, mozzarella, spicy salami and ricotta", price: "€9,00", category: "pizze", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Norma", name_en: "Norma", desc: "pomodoro, mozzarella, melanzane fritte e ricotta salata", desc_en: "tomato, mozzarella, fried aubergines and salted ricotta", price: "€9,00", category: "pizze", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
-
-        // CALZONI
         { name: "Calzone Liscio", name_en: "Plain Calzone", desc: "pomodoro, mozzarella e prosciutto cotto", desc_en: "tomato, mozzarella and cooked ham", price: "€8,00", category: "calzoni", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Calzone Farcito", name_en: "Stuffed Calzone", desc: "pomodoro, mozzarella, prosciutto cotto, funghi e carciofi", desc_en: "tomato, mozzarella, cooked ham, mushrooms and artichokes", price: "€9,00", category: "calzoni", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Calzone Antico", name_en: "Ancient Calzone", desc: "mozzarella, prosciutto cotto e ricotta fresca", desc_en: "mozzarella, cooked ham and fresh ricotta", price: "€9,00", category: "calzoni", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Calzone 4 formaggi", name_en: "Four cheese Calzone", desc: "mozzarella, formaggi misti", desc_en: "mozzarella, mixed cheeses", price: "€9,00", category: "calzoni", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Calzone Al Maneggio", name_en: "Al Maneggio Calzone", desc: "mozzarella, zola e friarielli", desc_en: "mozzarella, gorgonzola and turnip greens", price: "€10,00", category: "calzoni", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
-
-        // FOCACCE
         { name: "Focaccia del Re", name_en: "King's Focaccia", desc: "insalata mista, prosciutto crudo e bocconcini", desc_en: "mixed salad, Parma ham and buffalo bites", price: "€10,00", category: "focacce", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Focaccia Primavera", name_en: "Spring Focaccia", desc: "origano, olio, insalata mista, pomodorini, mozzarelline o bufala", desc_en: "oregano, oil, mixed salad, cherry tomatoes, mini mozzarella or buffalo", price: "€7,00", category: "focacce", allergens: "glutine, lattosio", allergens_en: "gluten, lactose" },
         { name: "Focaccia Fumè", name_en: "Smoked Focaccia", desc: "scamorza e spada affumicato", desc_en: "scamorza and smoked swordfish", price: "€10,00", category: "focacce", allergens: "glutine, lattosio, pesce", allergens_en: "gluten, lactose, fish" },
@@ -560,7 +568,7 @@
         { name: "Coppa gelato affogato", name_en: "Affogato ice cream cup", desc: "", desc_en: "", price: "€6,00", category: "dolci", allergens: "lattosio, uova", allergens_en: "lactose, eggs" },
         { name: "Cestino di ananas con menta, rhum e cannella", name_en: "Pineapple basket with mint, rum and cinnamon", desc: "", desc_en: "", price: "€6,00", category: "dolci", allergens: "nessuno", allergens_en: "none" },
 
-        // BEVANDE
+        // BEVANDE, CAFFETTERIA (invariati)
         { name: "Acqua minerale naturale/frizzante", name_en: "Still/sparkling mineral water", desc: "cl. 75", desc_en: "75 cl", price: "€2,00", category: "bevande", allergens: "nessuno", allergens_en: "none" },
         { name: "Bibite in lattina", name_en: "Canned soft drinks", desc: "", desc_en: "", price: "€3,00", category: "bevande", allergens: "nessuno", allergens_en: "none" },
         { name: "Beck's", name_en: "Beck's", desc: "cl. 33 / cl. 66", desc_en: "33 cl / 66 cl", price: "€3,00 / €5,00", category: "bevande", allergens: "glutine", allergens_en: "gluten" },
@@ -570,8 +578,6 @@
         { name: "Stella Artois alla spina", name_en: "Stella Artois draught", desc: "cl. 20 / cl. 40", desc_en: "20 cl / 40 cl", price: "€4,00 / €5,00", category: "bevande", allergens: "glutine", allergens_en: "gluten" },
         { name: "Birra Weiss alla spina", name_en: "Weiss draught beer", desc: "cl. 20 / cl. 40", desc_en: "20 cl / 40 cl", price: "€4,50 / €5,50", category: "bevande", allergens: "glutine", allergens_en: "gluten" },
         { name: "Vino della casa", name_en: "House wine", desc: "1/4 l. / 1/2 l. / 1 l.", desc_en: "1/4 l / 1/2 l / 1 l", price: "€3,00 / €6,00 / €12,00", category: "bevande", allergens: "solfiti", allergens_en: "sulphites" },
-
-        // CAFFETTERIA
         { name: "Caffè", name_en: "Espresso", desc: "", desc_en: "", price: "€2,00", category: "caffetteria", allergens: "nessuno", allergens_en: "none" },
         { name: "Caffè decaffeinato", name_en: "Decaffeinated coffee", desc: "", desc_en: "", price: "€2,00", category: "caffetteria", allergens: "nessuno", allergens_en: "none" },
         { name: "Caffè d'orzo", name_en: "Barley coffee", desc: "", desc_en: "", price: "€2,00", category: "caffetteria", allergens: "orzo", allergens_en: "barley" },
@@ -579,36 +585,36 @@
         { name: "Liquori nazionali", name_en: "Italian liqueurs", desc: "presenza di solfiti", desc_en: "contains sulphites", price: "€5,00", category: "caffetteria", allergens: "solfiti", allergens_en: "sulphites" },
         { name: "Liquori esteri", name_en: "International liqueurs", desc: "presenza di solfiti", desc_en: "contains sulphites", price: "da €7,00 a €12,00", category: "caffetteria", allergens: "solfiti", allergens_en: "sulphites" },
 
-        // VINI
-        { name: "Prosecco di Valdobbiadene DOCG Extra Dry “Colbelo”", name_en: "Prosecco di Valdobbiadene DOCG Extra Dry “Colbelo”", desc: "Veneto - Casa Vinicola Merotto", desc_en: "Veneto - Merotto Winery", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Prosecco di Valdobbiadene Sup. di Cartizze DOC Dry", name_en: "Prosecco di Valdobbiadene Sup. di Cartizze DOC Dry", desc: "Veneto - Zardetto Spumanti", desc_en: "Veneto - Zardetto Spumanti", price: "€30,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Franciacorta Spumante Metodo Classico Brut DOCG", name_en: "Franciacorta Classic Method Brut DOCG", desc: "Lombardia - San Cristoforo", desc_en: "Lombardy - San Cristoforo", price: "€35,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "A.A. Gewürztraminer DOC", name_en: "A.A. Gewürztraminer DOC", desc: "Alto Adige - Von Blumen", desc_en: "South Tyrol - Von Blumen", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Müller Thurgau", name_en: "Müller Thurgau", desc: "Trentino DOC - Azienda Agricola Roeno", desc_en: "Trentino DOC - Roeno Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Müller Thurgau Frizzante DOC", name_en: "Müller Thurgau Frizzante DOC", desc: "Trentino - Azienda Agricola Roeno", desc_en: "Trentino - Roeno Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Pinot nero vinificato in bianco", name_en: "Pinot Noir vinified as white", desc: "Lombardia - Cantine Montagna", desc_en: "Lombardy - Cantine Montagna", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Falanghina", name_en: "Falanghina", desc: "Campania - Cantina San Salvatore 1988", desc_en: "Campania - San Salvatore 1988", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Vermentino di Sardegna DOC", name_en: "Vermentino di Sardegna DOC", desc: "", desc_en: "", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Greco di Tufo DOCG", name_en: "Greco di Tufo DOCG", desc: "Campania - Cantina dei Monaci", desc_en: "Campania - Cantina dei Monaci", price: "€28,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Pinot Grigio Terra Alta", name_en: "Pinot Grigio Terra Alta", desc: "Friuli - Azienda Agricola Roeno", desc_en: "Friuli - Roeno Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Roeno", name_en: "Roeno", desc: "Piemonte - Monchiero Carbone", desc_en: "Piedmont - Monchiero Carbone", price: "€21,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Ribolla Gialla", name_en: "Ribolla Gialla", desc: "Friuli - Vigna del Lauro", desc_en: "Friuli - Vigna del Lauro", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Pecorino Bio IGT", name_en: "Organic Pecorino IGT", desc: "Abruzzo - Azienda Agricola Spinelli", desc_en: "Abruzzo - Spinelli Winery", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Verdicchio Classico Sup “Casal di Serra Vecchie Vigne” DOC", name_en: "Verdicchio Classico Sup “Casal di Serra Vecchie Vigne” DOC", desc: "Marche - Azienda Vinicola Umani Ronchi", desc_en: "Marche - Umani Ronchi Winery", price: "€30,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Mari di Ripiddu Etna Bianco DOC", name_en: "Mari di Ripiddu Etna Bianco DOC", desc: "Sicilia - Filippo Grasso", desc_en: "Sicily - Filippo Grasso", price: "€27,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Cerasuolo d’Abruzzo DOC", name_en: "Cerasuolo d’Abruzzo DOC", desc: "Abruzzo - Azienda Agricola Spinelli", desc_en: "Abruzzo - Spinelli Winery", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Barbera d'Asti Boscodonne DOC", name_en: "Barbera d'Asti Boscodonne DOC", desc: "Piemonte - Azienda Agricola Gianni Doglia", desc_en: "Piedmont - Gianni Doglia Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Dolcetto d'Alba DOC", name_en: "Dolcetto d'Alba DOC", desc: "Piemonte - Azienda Agricola La Ganghija", desc_en: "Piedmont - La Ganghija Winery", price: "€22,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Barolo DOCG", name_en: "Barolo DOCG", desc: "Piemonte - Az. Agr. Bovio Gianfranco", desc_en: "Piedmont - Bovio Gianfranco Winery", price: "€50,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Bonarda Oltrepò Pavese DOC Domina", name_en: "Bonarda Oltrepò Pavese DOC Domina", desc: "Emilia Romagna - Cantine Montagna", desc_en: "Emilia Romagna - Cantine Montagna", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Gutturnio Colli Piacentini DOC Fermo Bellamar", name_en: "Gutturnio Colli Piacentini DOC Fermo Bellamar", desc: "Emilia Romagna - Cantina Valtidone", desc_en: "Emilia Romagna - Cantina Valtidone", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "A.A. Pinot Nero DOC", name_en: "A.A. Pinot Noir DOC", desc: "Alto Adige - Rovere della Luna", desc_en: "South Tyrol - Rovere della Luna", price: "€23,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Morellino di Scansano DOCG", name_en: "Morellino di Scansano DOCG", desc: "Toscana - Cerreto Piano", desc_en: "Tuscany - Cerreto Piano", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Nero d'Avola Principe “N”", name_en: "Nero d'Avola Principe “N”", desc: "Sicilia - Principi di Spodoforo", desc_en: "Sicily - Principi di Spodoforo", price: "€22,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Chianti Classico DOCG Gallo Nero", name_en: "Chianti Classico DOCG Gallo Nero", desc: "Toscana - Tenuta di Lilliano", desc_en: "Tuscany - Tenuta di Lilliano", price: "€27,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Valpolicella Superiore “Ripasso” DOC", name_en: "Valpolicella Superiore “Ripasso” DOC", desc: "Veneto - Azienda Agricola Cà Rugate", desc_en: "Veneto - Cà Rugate Winery", price: "€26,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Ripiddu Etna Rosso DOC", name_en: "Ripiddu Etna Rosso DOC", desc: "Sicilia - Filippo Grasso", desc_en: "Sicily - Filippo Grasso", price: "€23,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" },
-        { name: "Moscato d'Asti DOCG", name_en: "Moscato d'Asti DOCG", desc: "Piemonte - Azienda Agricola Gianni Doglia", desc_en: "Piedmont - Gianni Doglia Winery", price: "€18,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites" }
+        // ==================== CARTA VINI CORRETTA CON SUDDIVISIONE ====================
+        { name: "Prosecco di Valdobbiadene DOCG Extra Dry “Colbelo”", name_en: "Prosecco di Valdobbiadene DOCG Extra Dry “Colbelo”", desc: "Veneto - Casa Vinicola Merotto", desc_en: "Veneto - Merotto Winery", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bollicine" },
+        { name: "Prosecco di Valdobbiadene Sup. di Cartizze DOCG Dry", name_en: "Prosecco di Valdobbiadene Sup. di Cartizze DOCG Dry", desc: "Veneto - Merotto", desc_en: "Veneto - Merotto", price: "€30,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bollicine" },
+        { name: "Franciacorta Spumante Metodo Classico Brut DOCG", name_en: "Franciacorta Classic Method Brut DOCG", desc: "Lombardia - San Cristoforo", desc_en: "Lombardy - San Cristoforo", price: "€35,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bollicine" },
+        { name: "A.A. Gewürztraminer DOC", name_en: "A.A. Gewürztraminer DOC", desc: "Alto Adige - Von Blumen", desc_en: "South Tyrol - Von Blumen", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Müller Thurgau DOC", name_en: "Müller Thurgau DOC", desc: "Trentino - Azienda Agricola Roeno", desc_en: "Trentino - Roeno Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Müller Thurgau Frizzante DOC", name_en: "Müller Thurgau Frizzante DOC", desc: "Trentino - Azienda Agricola Roeno", desc_en: "Trentino - Roeno Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Pinot nero vinificato in bianco DOC", name_en: "Pinot Noir vinified as white DOC", desc: "Lombardia - Cantine Montagna", desc_en: "Lombardy - Cantine Montagna", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Falanghina la Capranera", name_en: "Falanghina la Capranera", desc: "Campania", desc_en: "Campania", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Vermentino di Sardegna DOC", name_en: "Vermentino di Sardegna DOC", desc: "Sardegna - Audarya", desc_en: "Sardinia - Audarya", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Greco di Tufo DOCG Lincanto", name_en: "Greco di Tufo DOCG Lincanto", desc: "Campania - Mito", desc_en: "Campania - Mito", price: "€28,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Pinot Grigio Terra Alta DOC", name_en: "Pinot Grigio Terra Alta DOC", desc: "Friuli - Azienda Agricola Roeno", desc_en: "Friuli - Roeno Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Roero Arneis Cecu d'la Biunda DOCG", name_en: "Roero Arneis Cecu d'la Biunda DOCG", desc: "Piemonte - Monchiero Carbone", desc_en: "Piedmont - Monchiero Carbone", price: "€21,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Ribolla Gialla DOP", name_en: "Ribolla Gialla DOP", desc: "Friuli - Vigna del Lauro", desc_en: "Friuli - Vigna del Lauro", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Pecorino Bio", name_en: "Organic Pecorino", desc: "Abruzzo - Azienda Agricola Spinelli", desc_en: "Abruzzo - Spinelli Winery", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Verdicchio Dei Castelli di Jesi Classico Superiore DOC", name_en: "Verdicchio Dei Castelli di Jesi Classico Superiore DOC", desc: "Marche - Giuseppe Cavallaro", desc_en: "Marche - Giuseppe Cavallaro", price: "€30,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Mari di Ripiddu Etna Bianco DOC", name_en: "Mari di Ripiddu Etna Bianco DOC", desc: "Sicilia - Filippo Grasso", desc_en: "Sicily - Filippo Grasso", price: "€27,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "bianchi" },
+        { name: "Cerasuolo d’Abruzzo DOC", name_en: "Cerasuolo d’Abruzzo DOC", desc: "Abruzzo - Azienda Agricola Spinelli", desc_en: "Abruzzo - Spinelli Winery", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rosati" },
+        { name: "Barbera d'Asti Boscodonne DOC", name_en: "Barbera d'Asti Boscodonne DOC", desc: "Piemonte - Azienda Agricola Gianni Doglia", desc_en: "Piedmont - Gianni Doglia Winery", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Dolcetto d'Alba DOC", name_en: "Dolcetto d'Alba DOC", desc: "Piemonte - Azienda Agricola La Ganghija", desc_en: "Piedmont - La Ganghija Winery", price: "€22,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Barolo DOCG", name_en: "Barolo DOCG", desc: "Piemonte - Az. Agr. Bovio Gianfranco", desc_en: "Piedmont - Bovio Gianfranco Winery", price: "€50,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Bonarda Oltrepò Pavese DOC Domina", name_en: "Bonarda Oltrepò Pavese DOC Domina", desc: "Emilia Romagna - Cantine Montagna", desc_en: "Emilia Romagna - Cantine Montagna", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Gutturnio Colli Piacentini DOC Fermo Bellamar", name_en: "Gutturnio Colli Piacentini DOC Fermo Bellamar", desc: "Emilia Romagna - Cantina Valtidone", desc_en: "Emilia Romagna - Cantina Valtidone", price: "€20,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "A.A. Pinot Nero DOC", name_en: "A.A. Pinot Noir DOC", desc: "Alto Adige - Rovere della Luna", desc_en: "South Tyrol - Rovere della Luna", price: "€23,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Morellino di Scansano DOCG", name_en: "Morellino di Scansano DOCG", desc: "Toscana - Cerreto Piano", desc_en: "Tuscany - Cerreto Piano", price: "€25,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Nero d'Avola Principe “N”", name_en: "Nero d'Avola Principe “N”", desc: "Sicilia - Principi di Spodoforo", desc_en: "Sicily - Principi di Spodoforo", price: "€22,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Chianti Classico DOCG Gallo Nero", name_en: "Chianti Classico DOCG Gallo Nero", desc: "Toscana - Tenuta di Lilliano", desc_en: "Tuscany - Tenuta di Lilliano", price: "€27,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Valpolicella Superiore “Ripasso” DOC", name_en: "Valpolicella Superiore “Ripasso” DOC", desc: "Veneto - Azienda Agricola Cà Rugate", desc_en: "Veneto - Cà Rugate Winery", price: "€26,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Ripiddu Etna Rosso DOC", name_en: "Ripiddu Etna Rosso DOC", desc: "Sicilia - Filippo Grasso", desc_en: "Sicily - Filippo Grasso", price: "€23,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "rossi" },
+        { name: "Moscato d'Asti DOCG", name_en: "Moscato d'Asti DOCG", desc: "Piemonte - Azienda Agricola Gianni Doglia", desc_en: "Piedmont - Gianni Doglia Winery", price: "€18,00", category: "vini", allergens: "solfiti", allergens_en: "sulphites", wineGroup: "dolci" }
     ];
 
     const categoryLabels = {
@@ -630,6 +636,10 @@
         "bevande": "Beverages", "caffetteria": "Coffee & Spirits", "vini": "Wine List"
     };
 
+    const wineGroupLabels = { "bollicine": "Bollicine", "bianchi": "Vini Bianchi", "rosati": "Vini Rosati", "rossi": "Vini Rossi", "dolci": "Vini Dolci" };
+    const wineGroupLabels_en = { "bollicine": "Sparkling", "bianchi": "White Wines", "rosati": "Rosé Wines", "rossi": "Red Wines", "dolci": "Dessert Wines" };
+    const wineGroupOrder = ["bollicine","bianchi","rosati","rossi","dolci"];
+
     const bgImages = {
         "antipasti_pesce": "antipastomare.jpg", "primi_pesce": "primopesce.jpg",
         "antipasti_terra": "antipastoterra.jpg", "primi_terra": "primiterra.jpg",
@@ -646,10 +656,7 @@
     const colorCache = {};
 
     function getAverageColor(imgSrc, callback) {
-        if (colorCache[imgSrc]) {
-            callback(colorCache[imgSrc]);
-            return;
-        }
+        if (colorCache[imgSrc]) { callback(colorCache[imgSrc]); return; }
         const img = new Image();
         img.crossOrigin = "Anonymous";
         img.onload = function() {
@@ -661,14 +668,8 @@
             const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             let r = 0, g = 0, b = 0;
             const count = data.length / 4;
-            for (let i = 0; i < data.length; i += 4) {
-                r += data[i];
-                g += data[i+1];
-                b += data[i+2];
-            }
-            r = Math.round(r / count);
-            g = Math.round(g / count);
-            b = Math.round(b / count);
+            for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i+1]; b += data[i+2]; }
+            r = Math.round(r / count); g = Math.round(g / count); b = Math.round(b / count);
             const color = `rgb(${r},${g},${b})`;
             colorCache[imgSrc] = color;
             callback(color);
@@ -680,34 +681,15 @@
     function updateBackground(cat) {
         const url = bgImages[cat] || bgImages["default"];
         document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
-        getAverageColor(url, (color) => {
-            document.getElementById('bgColor').style.backgroundColor = color;
-        });
+        getAverageColor(url, (color) => { document.getElementById('bgColor').style.backgroundColor = color; });
     }
 
-    function preloadBgImages() {
-        const uniqueUrls = [...new Set(Object.values(bgImages))];
-        uniqueUrls.forEach(url => { const img = new Image(); img.src = url; });
-    }
-
-    function updateHeaderSub() {
-        document.getElementById('headerSub').innerHTML = lang === 'en' ?
-            "sea &amp; land cuisine &nbsp;·&nbsp; pizzeria &nbsp;·&nbsp; timeless elegance" :
-            "cucina di mare e di terra &nbsp;·&nbsp; pizzeria &nbsp;·&nbsp; eleganza senza tempo";
-    }
-
-    function updateFooter() {
-        document.getElementById('footerText').innerHTML = lang === 'en' ?
-            `&#9670; Allergens indicated: lactose, eggs, crustaceans, shellfish, nuts, gluten, sulphites. Ask the staff for details.<br>&copy; Al Maneggio · Authentic atmosphere` :
-            `&#9670; Allergeni indicati: lattosio, uova, crostacei, molluschi, frutta a guscio, glutine, solfiti. Per dettagli chiedere al personale.<br>&copy; Al Maneggio · Atmosfera autentica`;
-    }
-
+    function preloadBgImages() { [...new Set(Object.values(bgImages))].forEach(url => { const img = new Image(); img.src = url; }); }
+    function updateHeaderSub() { document.getElementById('headerSub').innerHTML = lang === 'en' ? "sea &amp; land cuisine &nbsp;·&nbsp; pizzeria &nbsp;·&nbsp; timeless elegance" : "cucina di mare e di terra &nbsp;·&nbsp; pizzeria &nbsp;·&nbsp; eleganza senza tempo"; }
+    function updateFooter() { document.getElementById('footerText').innerHTML = lang === 'en' ? `&#9670; Allergens indicated: lactose, eggs, crustaceans, shellfish, nuts, gluten, sulphites. Ask the staff for details.<br>&copy; Al Maneggio · Authentic atmosphere` : `&#9670; Allergeni indicati: lattosio, uova, crostacei, molluschi, frutta a guscio, glutine, solfiti. Per dettagli chiedere al personale.<br>&copy; Al Maneggio · Atmosfera autentica`; }
     function getItemName(item) { return lang === 'en' ? item.name_en : item.name; }
     function getItemDesc(item) { return lang === 'en' ? (item.desc_en || '') : (item.desc || ''); }
-    function getAllergens(item) {
-        const raw = lang === 'en' ? (item.allergens_en || '') : (item.allergens || '');
-        return (raw === 'nessuno' || raw === 'none' || raw === '' || raw === 'variabili' || raw === 'varies') ? '' : raw;
-    }
+    function getAllergens(item) { const raw = lang === 'en' ? (item.allergens_en || '') : (item.allergens || ''); return (raw === 'nessuno' || raw === 'none' || raw === '' || raw === 'variabili' || raw === 'varies') ? '' : raw; }
     function getCategoryLabel(cat) { return lang === 'en' ? categoryLabels_en[cat] || cat : categoryLabels[cat] || cat; }
 
     function buildFullMenu() {
@@ -717,94 +699,54 @@
         for (let cat of order) {
             const items = menuItems.filter(i => i.category === cat);
             if (items.length === 0) continue;
-            html += `<div class="menu-section" data-category="${cat}">
-                        <div class="section-title">${getCategoryLabel(cat)}</div>
-                        <div class="menu-list">`;
-            for (let item of items) {
-                const descHtml = getItemDesc(item) ? `<div class="item-desc">${getItemDesc(item)}</div>` : '';
-                const allergHtml = getAllergens(item) ? `<div class="allergen">${getAllergens(item)}</div>` : '';
-                html += `<div class="menu-item">
-                            <div class="item-info">
-                                <div class="item-name">${getItemName(item)}</div>
-                                ${descHtml}
-                                ${allergHtml}
-                            </div>
-                            <div class="item-price">${item.price}</div>
-                         </div>`;
+            html += `<div class="menu-section" data-category="${cat}"><div class="section-title">${getCategoryLabel(cat)}</div>`;
+            if (cat === "vini") {
+                // raggruppa per wineGroup
+                for (let group of wineGroupOrder) {
+                    const groupItems = items.filter(i => i.wineGroup === group);
+                    if (groupItems.length === 0) continue;
+                    const groupLabel = lang === 'en' ? wineGroupLabels_en[group] : wineGroupLabels[group];
+                    html += `<div class="wine-subsection"><div class="wine-subheading">${groupLabel}</div><div class="menu-list">`;
+                    for (let item of groupItems) {
+                        const descHtml = getItemDesc(item) ? `<div class="item-desc">${getItemDesc(item)}</div>` : '';
+                        const allergHtml = getAllergens(item) ? `<div class="allergen">${getAllergens(item)}</div>` : '';
+                        html += `<div class="menu-item"><div class="item-info"><div class="item-name">${getItemName(item)}</div>${descHtml}${allergHtml}</div><div class="item-price">${item.price}</div></div>`;
+                    }
+                    html += `</div></div>`;
+                }
+            } else {
+                html += `<div class="menu-list">`;
+                for (let item of items) {
+                    const descHtml = getItemDesc(item) ? `<div class="item-desc">${getItemDesc(item)}</div>` : '';
+                    const allergHtml = getAllergens(item) ? `<div class="allergen">${getAllergens(item)}</div>` : '';
+                    html += `<div class="menu-item"><div class="item-info"><div class="item-name">${getItemName(item)}</div>${descHtml}${allergHtml}</div><div class="item-price">${item.price}</div></div>`;
+                }
+                html += `</div>`;
             }
-            html += `</div></div>`;
+            html += `</div>`;
         }
         container.innerHTML = html;
     }
 
     function applyFilterAndUpdate() {
         const sections = document.querySelectorAll('.menu-section');
-        if (currentFilter === "all") {
-            sections.forEach(s => s.style.display = 'block');
-        } else if (currentFilter === "pizzeria") {
-            sections.forEach(s => {
-                const cat = s.getAttribute('data-category');
-                s.style.display = (cat === 'pizze' || cat === 'calzoni' || cat === 'focacce') ? 'block' : 'none';
-            });
-        } else {
-            sections.forEach(s => {
-                s.style.display = s.getAttribute('data-category') === currentFilter ? 'block' : 'none';
-            });
-        }
-        // Aggiorna i titoli delle sezioni (per cambio lingua)
-        sections.forEach(s => {
-            const cat = s.getAttribute('data-category');
-            const titleDiv = s.querySelector('.section-title');
-            if (titleDiv) titleDiv.textContent = getCategoryLabel(cat);
-        });
+        if (currentFilter === "all") { sections.forEach(s => s.style.display = 'block'); }
+        else if (currentFilter === "pizzeria") { sections.forEach(s => { const cat = s.getAttribute('data-category'); s.style.display = (cat === 'pizze' || cat === 'calzoni' || cat === 'focacce') ? 'block' : 'none'; }); }
+        else { sections.forEach(s => { s.style.display = s.getAttribute('data-category') === currentFilter ? 'block' : 'none'; }); }
+        sections.forEach(s => { const cat = s.getAttribute('data-category'); const titleDiv = s.querySelector('.section-title'); if (titleDiv) titleDiv.textContent = getCategoryLabel(cat); });
+        if (currentFilter === "vini") document.querySelectorAll('.wine-subheading').forEach(h => { const group = h.innerText; });
     }
 
-    function rebuildMenu() {
-        buildFullMenu();
-        applyFilterAndUpdate();
-    }
+    function rebuildMenu() { buildFullMenu(); applyFilterAndUpdate(); }
 
     function renderFilters() {
         const filterOrder = ["all","antipasti_pesce","antipasti_terra","primi_pesce","primi_terra","secondi_pesce","secondi_terra","contorni","insalatone","formaggi","pizzeria","dolci","bevande","caffetteria","vini"];
-        document.getElementById('filterBar').innerHTML = filterOrder.map(cat =>
-            `<button class="filter-btn ${currentFilter === cat ? 'active' : ''}" data-cat="${cat}">${cat === "all" ? (lang === 'en' ? "Full Menu" : "Tutto il menù") : getCategoryLabel(cat)}</button>`
-        ).join('');
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', (e) => {
-            currentFilter = btn.dataset.cat;
-            renderFilters();
-            applyFilterAndUpdate();
-            updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
-        }));
+        document.getElementById('filterBar').innerHTML = filterOrder.map(cat => `<button class="filter-btn ${currentFilter === cat ? 'active' : ''}" data-cat="${cat}">${cat === "all" ? (lang === 'en' ? "Full Menu" : "Tutto il menù") : getCategoryLabel(cat)}</button>`).join('');
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', (e) => { currentFilter = btn.dataset.cat; renderFilters(); applyFilterAndUpdate(); updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter); }));
     }
 
-    // Unico gestore della lingua
-    document.getElementById('langBtn').onclick = () => {
-        lang = lang === 'it' ? 'en' : 'it';
-        document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹';
-        rebuildMenu();          // ricostruisce l'intero menù con le nuove traduzioni
-        renderFilters();       // rigenera i bottoni con le nuove etichette
-        updateFooter();
-        updateHeaderSub();
-        updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter);
-    };
-
-    window.addEventListener('load', () => {
-        preloadBgImages();
-        buildFullMenu();
-        renderFilters();
-        applyFilterAndUpdate();
-        updateBackground("default");
-        updateHeaderSub();
-        updateFooter();
-
-        setTimeout(() => {
-            const hero = document.getElementById('logoHero');
-            hero.classList.add('hide');
-            document.getElementById('fixedLogo').classList.add('visible');
-            document.getElementById('mainContainer').classList.add('reveal');
-            setTimeout(() => hero.style.display = 'none', 1000);
-        }, 1300);
-    });
+    document.getElementById('langBtn').onclick = () => { lang = lang === 'it' ? 'en' : 'it'; document.getElementById('langBtn').querySelector('span').textContent = lang === 'it' ? '🇬🇧' : '🇮🇹'; rebuildMenu(); renderFilters(); updateFooter(); updateHeaderSub(); updateBackground(currentFilter === "pizzeria" ? "pizzeria" : currentFilter); };
+    window.addEventListener('load', () => { preloadBgImages(); buildFullMenu(); renderFilters(); applyFilterAndUpdate(); updateBackground("default"); updateHeaderSub(); updateFooter(); setTimeout(() => { const hero = document.getElementById('logoHero'); hero.classList.add('hide'); document.getElementById('fixedLogo').classList.add('visible'); document.getElementById('mainContainer').classList.add('reveal'); setTimeout(() => hero.style.display = 'none', 1000); }, 1300); });
 </script>
 </body>
 </html>
