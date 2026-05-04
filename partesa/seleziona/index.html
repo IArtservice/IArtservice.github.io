@@ -175,65 +175,74 @@
             cursor: pointer;
         }
 
-        /* Bottone WhatsApp flottante sempre visibile con testo */
-        .float-wa {
+        /* ----- PULSANTE WHATSAPP: CERCHIO + TESTO AFFIANCATO (sempre visibile, non invasivo) ----- */
+        .whatsapp-wrapper {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        /* Il cerchio con icona */
+        .wa-circle {
+            width: 56px;
+            height: 56px;
             background-color: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+            font-size: 28px;
             color: white;
-            padding: 10px 18px;
+        }
+        .wa-circle:hover {
+            transform: scale(1.05);
+            background-color: #20b859;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+        .wa-circle:active {
+            transform: scale(0.96);
+        }
+        /* Testo affiancato */
+        .wa-text {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            color: white;
+            padding: 8px 16px;
             border-radius: 40px;
             font-size: 14px;
             font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: 0.2s;
-            z-index: 1000;
-            border: none;
             font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
-        .float-wa:hover {
-            transform: scale(1.02);
-            background-color: #20b859;
+        .whatsapp-wrapper:hover .wa-text {
+            background: #25D366;
+            transform: translateX(-4px);
         }
-        /* Icona piccola opzionale (emoji) */
-        .float-wa::before {
-            content: "💬";
-            font-size: 18px;
-        }
-
+        /* Su schermi piccoli riduci le dimensioni ma mantieni leggibilità */
         @media (max-width: 600px) {
-            body {
-                padding: 8px;
+            .wa-circle {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
             }
-            .container {
-                padding: 12px;
-            }
-            .filters-bar {
-                gap: 8px;
-            }
-            .filter-group {
-                min-width: 110px;
-            }
-            .action-buttons button {
-                font-size: 0.75rem;
-                padding: 6px 8px;
-            }
-            th, td {
-                padding: 8px 4px;
-            }
-            .float-wa {
-                padding: 8px 14px;
+            .wa-text {
                 font-size: 12px;
+                padding: 6px 12px;
+                white-space: nowrap;
+            }
+            .whatsapp-wrapper {
                 bottom: 16px;
                 right: 16px;
-            }
-            .float-wa::before {
-                font-size: 16px;
+                gap: 8px;
             }
         }
     </style>
@@ -273,7 +282,7 @@
                 <tr><th class="checkbox-col">✔</th><th>Codice</th><th>Descrizione</th><th>Mis.</th><th>UDM</th><th>UM</th><th>Categoria</th><th>Segmento</th></tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="8" style="text-align:center">Caricamento in corso...<br>Se non vedi i prodotti, aggiorna la pagina.</td></tr>
+                <tr><td colspan="8" style="text-align:center">Caricamento in corso...<br>Se non vedi i prodotti, aggiorna la pagina.}</td></tr>
             </tbody>
         </table>
     </div>
@@ -285,11 +294,14 @@
     <div id="infoMsg"></div>
 </div>
 
-<!-- Bottone WhatsApp flottante con testo -->
-<button id="floatWhatsAppBtn" class="float-wa">Invia WhatsApp</button>
+<!-- PULSANTE WHATSAPP: cerchio + testo affiancato, sempre visibile, non invasivo -->
+<div id="whatsappWrapper" class="whatsapp-wrapper">
+    <div class="wa-circle">📱</div>
+    <div class="wa-text">Invia su WhatsApp</div>
+</div>
 
 <script>
-    // ---------- Variabili ----------
+    // ---------- Variabili (TUTTO IDENTICO ALL'ORIGINALE) ----------
     let prodotti = [];
     let filteredIndices = [];
     let selectedIndices = new Set();
@@ -301,7 +313,7 @@
     const resetBtn = document.getElementById('resetFiltersBtn');
     const selectAllBtn = document.getElementById('selectAllBtn');
     const deselectAllBtn = document.getElementById('deselectAllBtn');
-    const floatWaBtn = document.getElementById('floatWhatsAppBtn');
+    const waWrapper = document.getElementById('whatsappWrapper');
     const tableBody = document.getElementById('tableBody');
     const statsSpan = document.getElementById('stats');
     const infoMsgDiv = document.getElementById('infoMsg');
@@ -379,7 +391,7 @@
 
     function renderTable() {
         if (!prodotti.length) {
-            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.}</td></tr>';
             statsSpan.innerText = 'Nessun prodotto';
             return;
         }
@@ -568,7 +580,7 @@
             .catch(error => {
                 console.error(error);
                 statsSpan.innerText = "File non trovato";
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">⚠️ File "elenco_prodotti.xlsx" non trovato. Verifica che sia nella stessa cartella.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">⚠️ File "elenco_prodotti.xlsx" non trovato. Verifica che sia nella stessa cartella.}</td></tr>`;
                 showMessage("File predefinito mancante. Carica manualmente usando il pulsante qui sotto (se visibile)", true);
                 if (!document.getElementById('fallbackUpload')) {
                     const fallbackDiv = document.createElement('div');
@@ -613,13 +625,14 @@
         reader.readAsArrayBuffer(file);
     }
 
+    // Event listeners IDENTICI
     filterCategoria.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
     filterSegmento.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
     searchInput.addEventListener('input', applyFilters);
     resetBtn.addEventListener('click', resetFilters);
     selectAllBtn.addEventListener('click', selectAllFiltered);
     deselectAllBtn.addEventListener('click', deselectAll);
-    floatWaBtn.addEventListener('click', shareTextWhatsApp);
+    waWrapper.addEventListener('click', shareTextWhatsApp);
 
     loadDefaultFile();
 </script>
