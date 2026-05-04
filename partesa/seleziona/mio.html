@@ -89,6 +89,14 @@
             color: #2d2d2d;
         }
 
+        .btn-wa {
+            background-color: #25D366;
+        }
+
+        .btn-email {
+            background-color: #34a853;
+        }
+
         .action-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -164,6 +172,7 @@
             color: #c5221f;
         }
 
+        /* stile per il link descrizione: mantiene l'aspetto della cella ma aggiunge underline al passaggio */
         .product-link {
             text-decoration: none;
             color: inherit;
@@ -174,38 +183,6 @@
             text-decoration: underline;
             cursor: pointer;
         }
-
-        /* Bottone WhatsApp flottante sempre visibile con testo */
-        .float-wa {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #25D366;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: 0.2s;
-            z-index: 1000;
-            border: none;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .float-wa:hover {
-            transform: scale(1.02);
-            background-color: #20b859;
-        }
-        /* Icona piccola opzionale (emoji) */
-        .float-wa::before {
-            content: "💬";
-            font-size: 18px;
-        }
-
         @media (max-width: 600px) {
             body {
                 padding: 8px;
@@ -225,15 +202,6 @@
             }
             th, td {
                 padding: 8px 4px;
-            }
-            .float-wa {
-                padding: 8px 14px;
-                font-size: 12px;
-                bottom: 16px;
-                right: 16px;
-            }
-            .float-wa::before {
-                font-size: 16px;
             }
         }
     </style>
@@ -282,11 +250,15 @@
         <button id="selectAllBtn">✅ Seleziona tutti</button>
         <button id="deselectAllBtn">❌ Deseleziona tutti</button>
     </div>
+
+    <div class="action-buttons">
+        <button id="exportExcelBtn" class="btn-secondary">📎 Scarica Excel</button>
+        <button id="whatsappTextBtn" class="btn-wa">💬 WhatsApp</button>
+        <button id="emailTextBtn" class="btn-email">✉️ Email</button>
+    </div>
+
     <div id="infoMsg"></div>
 </div>
-
-<!-- Bottone WhatsApp flottante con testo -->
-<button id="floatWhatsAppBtn" class="float-wa">Invia WhatsApp</button>
 
 <script>
     // ---------- Variabili ----------
@@ -301,18 +273,22 @@
     const resetBtn = document.getElementById('resetFiltersBtn');
     const selectAllBtn = document.getElementById('selectAllBtn');
     const deselectAllBtn = document.getElementById('deselectAllBtn');
-    const floatWaBtn = document.getElementById('floatWhatsAppBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
+    const whatsappTextBtn = document.getElementById('whatsappTextBtn');
+    const emailTextBtn = document.getElementById('emailTextBtn');
     const tableBody = document.getElementById('tableBody');
     const statsSpan = document.getElementById('stats');
     const infoMsgDiv = document.getElementById('infoMsg');
 
     const WHATSAPP_NUMBER = "393331395730";
+    const EMAIL_TO = "iartservizi@gmail.com";
 
     function showMessage(msg, isError = false) {
         infoMsgDiv.innerHTML = `<div class="info-message ${isError ? 'error-message' : ''}">${msg}</div>`;
         setTimeout(() => infoMsgDiv.innerHTML = "", 4000);
     }
 
+    // aggiorna i menu a tendina in base ai dati presenti (e ai filtri attivi)
     function updateFilterOptions() {
         const currentCat = filterCategoria.value;
         const currentSeg = filterSegmento.value;
@@ -356,6 +332,7 @@
         filterSegmento.innerHTML = segHtml;
     }
 
+    // applica filtri (testo, categoria, segmento)
     function applyFilters() {
         const catValue = filterCategoria.value;
         const segValue = filterSegmento.value;
@@ -377,6 +354,7 @@
         renderTable();
     }
 
+    // crea la tabella: la colonna "Descrizione" diventa cliccabile (link se presente nell'Excel)
     function renderTable() {
         if (!prodotti.length) {
             tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.</td></tr>';
@@ -391,6 +369,7 @@
             const row = document.createElement('tr');
             if (isSelected) row.classList.add('selected-row');
 
+            // checkbox
             const tdCheck = document.createElement('td');
             tdCheck.classList.add('checkbox-col');
             const chk = document.createElement('input');
@@ -404,10 +383,12 @@
             tdCheck.appendChild(chk);
             row.appendChild(tdCheck);
 
+            // codice
             const tdCod = document.createElement('td');
             tdCod.textContent = p.codArt || '';
             row.appendChild(tdCod);
 
+            // descrizione (cliccabile se presente il link)
             const tdDesc = document.createElement('td');
             const descText = p.descrizione || '';
             if (p.link && p.link.trim() !== '') {
@@ -423,18 +404,23 @@
             }
             row.appendChild(tdDesc);
 
+            // misura
             const tdMis = document.createElement('td');
             tdMis.textContent = p.misura || '';
             row.appendChild(tdMis);
+            // UDM
             const tdUdm = document.createElement('td');
             tdUdm.textContent = p.udm || '';
             row.appendChild(tdUdm);
+            // UM
             const tdUm = document.createElement('td');
             tdUm.textContent = p.um || '';
             row.appendChild(tdUm);
+            // categoria
             const tdCat = document.createElement('td');
             tdCat.textContent = p.categoria || '';
             row.appendChild(tdCat);
+            // segmento
             const tdSeg = document.createElement('td');
             tdSeg.textContent = p.segmento || '';
             row.appendChild(tdSeg);
@@ -468,6 +454,7 @@
         showMessage("Filtri resettati");
     }
 
+    // testi per WhatsApp / Email (solo codice e descrizione)
     function getSelectedText() {
         if (selectedIndices.size === 0) {
             alert("Nessun prodotto selezionato.");
@@ -489,11 +476,48 @@
         showMessage("📱 Aperto WhatsApp, invia il messaggio.");
     }
 
+    function shareTextEmail() {
+        const text = getSelectedText();
+        if (!text) return;
+        const subject = encodeURIComponent("Prodotti selezionati");
+        const body = encodeURIComponent("Elenco (codice + descrizione, separati da tab):\n\n" + text);
+        window.location.href = `mailto:${EMAIL_TO}?subject=${subject}&body=${body}`;
+        showMessage("✉️ Aperta mail, invia il messaggio.");
+    }
+
+    function downloadExcel() {
+        if (selectedIndices.size === 0) {
+            alert("Nessun prodotto selezionato.");
+            return;
+        }
+        const rows = [["OSS Cat Rag", "OSS Segmento", "Prodotti selez.", "Cod Art", "Desc Articolo", "Misura", "UDM", "UM"]];
+        for (let idx of selectedIndices) {
+            const p = prodotti[idx];
+            rows.push([
+                p.categoria || "",
+                p.segmento || "",
+                "",
+                p.codArt || "",
+                p.descrizione || "",
+                p.misura || "",
+                p.udm || "",
+                p.um || ""
+            ]);
+        }
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{wch:15},{wch:20},{wch:12},{wch:12},{wch:40},{wch:10},{wch:8},{wch:8}];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Prodotti_selezionati");
+        XLSX.writeFile(wb, `prodotti_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        showMessage("✅ File Excel scaricato.");
+    }
+
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
+    // Funzione comune per parsare il file Excel (legge anche la colonna "link")
     function parseProductData(rows, headerIndex) {
         const headers = rows[headerIndex];
         const colIdx = {
@@ -534,6 +558,7 @@
         return prodottiTemp;
     }
 
+    // Carica il file predefinito "elenco_prodotti.xlsx"
     function loadDefaultFile() {
         statsSpan.innerText = "Caricamento...";
         fetch('elenco_prodotti.xlsx')
@@ -570,6 +595,7 @@
                 statsSpan.innerText = "File non trovato";
                 tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">⚠️ File "elenco_prodotti.xlsx" non trovato. Verifica che sia nella stessa cartella.</td></tr>`;
                 showMessage("File predefinito mancante. Carica manualmente usando il pulsante qui sotto (se visibile)", true);
+                // mostra input file di fallback
                 if (!document.getElementById('fallbackUpload')) {
                     const fallbackDiv = document.createElement('div');
                     fallbackDiv.style.margin = "12px 0";
@@ -582,6 +608,7 @@
             });
     }
 
+    // Gestione upload manuale (con link)
     function handleManualUpload(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -613,14 +640,18 @@
         reader.readAsArrayBuffer(file);
     }
 
+    // Event listeners
     filterCategoria.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
     filterSegmento.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
     searchInput.addEventListener('input', applyFilters);
     resetBtn.addEventListener('click', resetFilters);
     selectAllBtn.addEventListener('click', selectAllFiltered);
     deselectAllBtn.addEventListener('click', deselectAll);
-    floatWaBtn.addEventListener('click', shareTextWhatsApp);
+    exportExcelBtn.addEventListener('click', downloadExcel);
+    whatsappTextBtn.addEventListener('click', shareTextWhatsApp);
+    emailTextBtn.addEventListener('click', shareTextEmail);
 
+    // Avvio
     loadDefaultFile();
 </script>
 </body>
