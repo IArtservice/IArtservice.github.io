@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Listino Vini - Seleziona prodotti</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f5f7fb;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            padding: 20px 24px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+            color: #1e466e;
+        }
+
+        .sub {
+            color: #4a627a;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            border-left: 3px solid #ff9800;
+            padding-left: 12px;
+        }
+
+        .filters-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 20px 0 18px;
+            align-items: flex-end;
+            background: #f8fafd;
+            padding: 16px 18px;
+            border-radius: 28px;
+        }
+
+        .filter-card {
+            flex: 1 1 160px;
+            min-width: 130px;
+        }
+
+        .filter-card label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #2c5a7a;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        select, .search-input, button {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 60px;
+            border: 1px solid #d4dce6;
+            background: white;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        select:focus, .search-input:focus {
+            outline: none;
+            border-color: #ff9800;
+            box-shadow: 0 0 0 2px rgba(255,152,0,0.2);
+        }
+
+        button {
+            background-color: #1e466e;
+            color: white;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0f2f4f;
+        }
+
+        .btn-reset {
+            background-color: #e0e7ef;
+            color: #1e466e;
+        }
+        .btn-reset:hover {
+            background-color: #cbd7e4;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0 14px;
+        }
+
+        .action-bar button {
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .stats {
+            background: #eef2ff;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 12px 0 16px;
+            display: inline-block;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid #eef2f6;
+            margin: 16px 0;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 850px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #eef2f6;
+            padding: 12px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f9fbfe;
+            font-weight: 700;
+            color: #1e466e;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+        }
+
+        .checkbox-col {
+            width: 32px;
+            text-align: center;
+        }
+
+        tr.selected-row {
+            background-color: #e9f7e1;
+        }
+
+        .product-link {
+            text-decoration: none;
+            color: #1e466e;
+            font-weight: 500;
+            border-bottom: 1px dotted #bbd0e6;
+        }
+        .product-link:hover {
+            color: #ff9800;
+            border-bottom-color: #ff9800;
+        }
+
+        .info-msg {
+            background: #e6f4ea;
+            color: #137333;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .error-msg {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .badge-formato {
+            background: #edf2f7;
+            border-radius: 40px;
+            padding: 2px 8px;
+            font-weight: 500;
+        }
+        .price-highlight {
+            font-weight: 700;
+            color: #1e466e;
+        }
+
+        .whatsapp-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(8px);
+            padding: 6px 20px 6px 12px;
+            border-radius: 60px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .wa-icon {
+            background-color: #25D366;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .wa-text {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        .whatsapp-fab:hover {
+            background: #25D366;
+            transform: scale(1.02);
+        }
+        .whatsapp-fab:hover .wa-icon {
+            background-color: white;
+            color: #25D366;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 14px; }
+            .filter-card { min-width: 120px; }
+            .wa-icon { width: 42px; height: 42px; font-size: 22px; }
+            .wa-text { font-size: 12px; }
+        }
+
+        /* Stile per il bottone di upload manuale */
+        .manual-upload-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff6e5;
+            border-radius: 28px;
+            border: 1px solid #ffe0b3;
+        }
+        .manual-upload-btn {
+            background-color: #ff9800;
+            color: #2d2d2d;
+            font-weight: bold;
+            padding: 12px 24px;
+            font-size: 1rem;
+            display: inline-block;
+            width: auto;
+            cursor: pointer;
+        }
+        .manual-upload-btn:hover {
+            background-color: #e68900;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🍷 Seleziona Vini</h1>
+    <div class="sub">Filtra per regione, azienda, tipologia, formato | listavino.xlsx</div>
+
+    <div class="filters-grid">
+        <div class="filter-card">
+            <label>🗺️ REGIONE</label>
+            <select id="filterRegione"><option value="">Tutte</option></select>
+        </div>
+        <div class="filter-card">
+            <label>🏢 AZIENDA / CANTINA</label>
+            <select id="filterAzienda"><option value="">Tutte</option></select>
+        </div>
+        <div class="filter-card">
+            <label>🍾 TIPO VINO</label>
+            <select id="filterTipo"><option value="">Tutti</option></select>
+        </div>
+        <div class="filter-card">
+            <label>📏 FORMATO</label>
+            <select id="filterFormato"><option value="">Tutti</option></select>
+        </div>
+        <div class="filter-card">
+            <label>🔍 CODICE / NOME</label>
+            <input type="text" id="searchInput" placeholder="es. E9442 o Barolo" class="search-input">
+        </div>
+        <div class="filter-card">
+            <label>&nbsp;</label>
+            <button id="resetFiltersBtn" class="btn-reset">⟳ Azzera filtri</button>
+        </div>
+    </div>
+
+    <div class="stats" id="statsContainer">Caricamento file in corso ...</div>
+    
+    <div class="action-bar">
+        <button id="selectAllBtn">✅ Seleziona tutti (filtrati)</button>
+        <button id="deselectAllBtn">❌ Deseleziona tutti</button>
+    </div>
+
+    <!-- Zona per upload manuale (inizialmente nascosta, compare solo se il caricamento automatico fallisce) -->
+    <div id="manualUploadZone" style="display: none;" class="manual-upload-container">
+        <p>📂 Non è stato possibile caricare automaticamente <strong>listavino.xlsx</strong>.</p>
+        <button id="manualUploadBtn" class="manual-upload-btn">📁 Seleziona il file Excel manualmente</button>
+        <p style="font-size:0.7rem; margin-top:8px;">(accetta file .xlsx o .xls)</p>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="productTable">
+            <thead>
+                <tr>
+                    <th class="checkbox-col">✔</th><th>Codice</th><th>Cantina</th><th>Tipo</th><th>Descrizione prodotto</th><th>Formato</th><th>Q.xC</th><th>€/bottiglia</th><th>€/cartone</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="9" style="text-align:center">⏳ Caricamento vini ...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="infoMsg"></div>
+</div>
+
+<div id="whatsappButton" class="whatsapp-fab">
+    <div class="wa-icon">📱</div>
+    <div class="wa-text">Invia selezionati su WhatsApp</div>
+</div>
+
+<script>
+    // ---------- GLOBALS ----------
+    let prodotti = [];
+    let filteredIndices = [];
+    let selectedIndices = new Set();
+
+    // DOM elements
+    const filterRegione = document.getElementById('filterRegione');
+    const filterAzienda = document.getElementById('filterAzienda');
+    const filterTipo = document.getElementById('filterTipo');
+    const filterFormato = document.getElementById('filterFormato');
+    const searchInput = document.getElementById('searchInput');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const whatsappBtn = document.getElementById('whatsappButton');
+    const tableBody = document.getElementById('tableBody');
+    const statsSpan = document.getElementById('statsContainer');
+    const infoMsgDiv = document.getElementById('infoMsg');
+    const manualUploadZone = document.getElementById('manualUploadZone');
+    const manualUploadBtn = document.getElementById('manualUploadBtn');
+
+    const WHATSAPP_NUMBER = "393331395730";
+
+    function showMessage(msg, isError = false) {
+        infoMsgDiv.innerHTML = `<div class="info-msg ${isError ? 'error-msg' : ''}">${msg}</div>`;
+        setTimeout(() => infoMsgDiv.innerHTML = "", 4500);
+    }
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function extractShortCantina(fullName) {
+        if (!fullName) return '';
+        const dashIndex = fullName.indexOf(' - ');
+        if (dashIndex !== -1) {
+            return fullName.substring(0, dashIndex).trim();
+        }
+        return fullName;
+    }
+
+    function refreshFilterOptions() {
+        const currentRegione = filterRegione.value;
+        const currentAzienda = filterAzienda.value;
+        const currentTipo = filterTipo.value;
+        const currentFormato = filterFormato.value;
+
+        let regioniSet = new Set();
+        let aziendeSet = new Set();
+        let tipiSet = new Set();
+        let formatiSet = new Set();
+
+        for (const p of prodotti) {
+            if (p.regione && p.regione.trim()) regioniSet.add(p.regione);
+            if (p.aziendaFull && p.aziendaFull.trim()) aziendeSet.add(p.aziendaFull);
+            if (p.tipoVino && p.tipoVino.trim()) tipiSet.add(p.tipoVino);
+            if (p.formato && p.formato.trim()) formatiSet.add(p.formato);
+        }
+
+        let regioniArr = Array.from(regioniSet).sort((a,b) => a.localeCompare(b, 'it'));
+        let htmlRegione = '<option value="">Tutte</option>';
+        for (let r of regioniArr) {
+            htmlRegione += `<option value="${escapeHtml(r)}" ${currentRegione === r ? 'selected' : ''}>${escapeHtml(r)}</option>`;
+        }
+        filterRegione.innerHTML = htmlRegione;
+
+        let aziendeArr = Array.from(aziendeSet).sort((a,b) => a.localeCompare(b, 'it'));
+        let htmlAzienda = '<option value="">Tutte</option>';
+        for (let az of aziendeArr) {
+            htmlAzienda += `<option value="${escapeHtml(az)}" ${currentAzienda === az ? 'selected' : ''}>${escapeHtml(az)}</option>`;
+        }
+        filterAzienda.innerHTML = htmlAzienda;
+
+        let tipiArr = Array.from(tipiSet).sort();
+        let htmlTipo = '<option value="">Tutti</option>';
+        for (let t of tipiArr) {
+            htmlTipo += `<option value="${escapeHtml(t)}" ${currentTipo === t ? 'selected' : ''}>${escapeHtml(t)}</option>`;
+        }
+        filterTipo.innerHTML = htmlTipo;
+
+        let formatiArr = Array.from(formatiSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+        let htmlFormato = '<option value="">Tutti</option>';
+        for (let f of formatiArr) {
+            htmlFormato += `<option value="${escapeHtml(f)}" ${currentFormato === f ? 'selected' : ''}>${escapeHtml(f)}</option>`;
+        }
+        filterFormato.innerHTML = htmlFormato;
+    }
+
+    function applyFilters() {
+        const regioneVal = filterRegione.value;
+        const aziendaVal = filterAzienda.value;
+        const tipoVal = filterTipo.value;
+        const formatoVal = filterFormato.value;
+        const searchTerm = searchInput.value.trim().toLowerCase();
+
+        filteredIndices = [];
+        for (let i = 0; i < prodotti.length; i++) {
+            const p = prodotti[i];
+            let ok = true;
+            if (regioneVal && p.regione !== regioneVal) ok = false;
+            if (aziendaVal && p.aziendaFull !== aziendaVal) ok = false;
+            if (tipoVal && p.tipoVino !== tipoVal) ok = false;
+            if (formatoVal && p.formato !== formatoVal) ok = false;
+            if (searchTerm) {
+                const codeMatch = (p.codArt || "").toLowerCase().includes(searchTerm);
+                const descMatch = (p.descrizione || "").toLowerCase().includes(searchTerm);
+                if (!codeMatch && !descMatch) ok = false;
+            }
+            if (ok) filteredIndices.push(i);
+        }
+        renderTable();
+    }
+
+    function renderTable() {
+        if (!prodotti.length) {
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center">📭 Nessun prodotto caricato.</td></tr>';
+            statsSpan.innerText = `📊 0 prodotti — selezionati: 0`;
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        for (let idx of filteredIndices) {
+            const p = prodotti[idx];
+            const isSelected = selectedIndices.has(idx);
+            const row = document.createElement('tr');
+            if (isSelected) row.classList.add('selected-row');
+
+            const tdChk = document.createElement('td');
+            tdChk.classList.add('checkbox-col');
+            const chk = document.createElement('input');
+            chk.type = 'checkbox';
+            chk.checked = isSelected;
+            chk.addEventListener('change', (function(globalIdx) {
+                return function(e) {
+                    if (e.target.checked) selectedIndices.add(globalIdx);
+                    else selectedIndices.delete(globalIdx);
+                    renderTable();
+                };
+            })(idx));
+            tdChk.appendChild(chk);
+            row.appendChild(tdChk);
+
+            const tdCod = document.createElement('td');
+            tdCod.textContent = p.codArt || '';
+            row.appendChild(tdCod);
+
+            const tdCantina = document.createElement('td');
+            tdCantina.textContent = p.cantinaShort || '';
+            row.appendChild(tdCantina);
+
+            const tdTipo = document.createElement('td');
+            tdTipo.textContent = p.tipoVino || '';
+            row.appendChild(tdTipo);
+
+            const tdDesc = document.createElement('td');
+            const descText = p.descrizione || '';
+            if (p.link && p.link.trim() !== '' && p.link !== '#') {
+                const link = document.createElement('a');
+                link.href = p.link;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = descText;
+                link.className = 'product-link';
+                tdDesc.appendChild(link);
+            } else {
+                tdDesc.textContent = descText;
+            }
+            row.appendChild(tdDesc);
+
+            const tdForm = document.createElement('td');
+            tdForm.innerHTML = `<span class="badge-formato">${escapeHtml(p.formato || '')}</span>`;
+            row.appendChild(tdForm);
+
+            const tdQxc = document.createElement('td');
+            tdQxc.textContent = p.qxc !== null && p.qxc !== undefined ? p.qxc : '';
+            row.appendChild(tdQxc);
+
+            const tdPrezzo = document.createElement('td');
+            tdPrezzo.className = 'price-highlight';
+            tdPrezzo.textContent = (p.prezzoBottiglia !== null && !isNaN(p.prezzoBottiglia)) ? `€ ${p.prezzoBottiglia.toFixed(2)}` : '-';
+            row.appendChild(tdPrezzo);
+
+            const tdCartone = document.createElement('td');
+            tdCartone.textContent = (p.prezzoCartone !== null && !isNaN(p.prezzoCartone)) ? `€ ${p.prezzoCartone.toFixed(2)}` : '-';
+            row.appendChild(tdCartone);
+
+            fragment.appendChild(row);
+        }
+
+        tableBody.innerHTML = '';
+        tableBody.appendChild(fragment);
+        const totaleFiltrati = filteredIndices.length;
+        let selezionatiFiltrati = 0;
+        for (let idx of selectedIndices) {
+            if (filteredIndices.includes(idx)) selezionatiFiltrati++;
+        }
+        statsSpan.innerHTML = `🍇 ${totaleFiltrati} prodotti visualizzati — 🗸 selezionati: ${selezionatiFiltrati} (totale caricati: ${prodotti.length})`;
+    }
+
+    function selectAllFiltered() {
+        for (let idx of filteredIndices) selectedIndices.add(idx);
+        renderTable();
+        showMessage(`✅ Selezionati ${filteredIndices.length} prodotti visibili`);
+    }
+
+    function deselectAll() {
+        selectedIndices.clear();
+        renderTable();
+        showMessage(`❌ Nessun prodotto selezionato`);
+    }
+
+    function resetFilters() {
+        filterRegione.value = "";
+        filterAzienda.value = "";
+        filterTipo.value = "";
+        filterFormato.value = "";
+        searchInput.value = "";
+        refreshFilterOptions();
+        applyFilters();
+        showMessage("Filtri azzerati");
+    }
+
+    function getSelectedTextForWhatsApp() {
+        if (selectedIndices.size === 0) {
+            alert("⚠️ Nessun prodotto selezionato. Seleziona almeno un vino.");
+            return null;
+        }
+        let lines = [];
+        lines.push(`📋 *LISTINO VINI SELEZIONATO* (${selectedIndices.size} prodotti)`);
+        lines.push(`───────────────────`);
+        for (let idx of selectedIndices) {
+            const p = prodotti[idx];
+            const descr = p.descrizione || '—';
+            const cod = p.codArt || '';
+            const formato = p.formato || '';
+            const prezzoBott = (p.prezzoBottiglia != null && !isNaN(p.prezzoBottiglia)) ? `€ ${p.prezzoBottiglia.toFixed(2)}` : '—';
+            lines.push(`📌 ${cod} — ${descr} (${formato}) | ${prezzoBott}/bt`);
+        }
+        lines.push(`───────────────────`);
+        lines.push(`🔗 Generato dal selettore vini Horeca`);
+        return lines.join("\n");
+    }
+
+    function shareWhatsApp() {
+        const text = getSelectedTextForWhatsApp();
+        if (!text) return;
+        const encoded = encodeURIComponent(text);
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
+        showMessage(`📲 Aperto WhatsApp - invia il messaggio precompilato`);
+    }
+
+    // ---------- PARSING EXCEL ----------
+    function parseExcelRows(rows) {
+        let headerIndex = -1;
+        for (let i = 0; i < Math.min(rows.length, 40); i++) {
+            const firstCell = rows[i] && rows[i][0] ? rows[i][0].toString().trim() : "";
+            if (firstCell === "Regione/Nazione") {
+                headerIndex = i;
+                break;
+            }
+        }
+        if (headerIndex === -1) throw new Error("Intestazione 'Regione/Nazione' non trovata");
+
+        const colIdx = {
+            regione: 0,
+            codArt: 1,
+            tipoVinoRaw: 2,
+            descrizione: 3,
+            formato: 4,
+            qxc: 5,
+            prezzo: 6,
+            link: 8
+        };
+
+        let currentRegione = "";
+        let currentAziendaFull = "";
+
+        const regioniConosciute = new Set([
+            "PIEMONTE", "LOMBARDIA", "TRENTINO ALTO ADIGE", "VENETO", "FRIULI VENEZIA GIULIA",
+            "EMILIA ROMAGNA", "TOSCANA", "MARCHE", "UMBRIA", "LAZIO", "ABRUZZO", "MOLISE",
+            "CAMPANIA", "PUGLIA", "BASILICATA", "CALABRIA", "SICILIA", "SARDEGNA", "LIGURIA",
+            "FRANCIA", "SPAGNA", "GERMANIA", "AUSTRIA", "SLOVENIA", "USA", "ARGENTINA"
+        ]);
+
+        const prodottiTemp = [];
+
+        for (let i = headerIndex + 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || row.length === 0 || row.every(cell => cell === undefined || cell === "")) continue;
+
+            const firstCol = (row[colIdx.regione] !== undefined) ? row[colIdx.regione].toString().trim() : "";
+            const codice = (row[colIdx.codArt] !== undefined && row[colIdx.codArt] !== "") ? row[colIdx.codArt].toString().trim() : "";
+
+            if (codice === "") {
+                if (firstCol !== "") {
+                    if (regioniConosciute.has(firstCol.toUpperCase())) {
+                        currentRegione = firstCol;
+                    }
+                    if (firstCol.includes(" - ") || /[A-Z]{2,}\s*-\s*[A-Z]/i.test(firstCol) || 
+                        /(WUNDERGLASS|COLOMBO|FREGONESE|BOVIO|CASCINA|TERRA|AUDARYA|DRAPPIER|DURIN|BELLEI|SPINELLI|VALLONE)/i.test(firstCol)) {
+                        currentAziendaFull = firstCol;
+                    }
+                }
+                continue;
+            }
+
+            const tipoRaw = (row[colIdx.tipoVinoRaw] !== undefined) ? row[colIdx.tipoVinoRaw].toString().trim() : "";
+            let tipoVino = "";
+            if (tipoRaw) {
+                const upper = tipoRaw.toUpperCase();
+                if (upper.includes("BIANCO") || upper === "BIANCO") tipoVino = "Bianco";
+                else if (upper.includes("ROSSO") || upper === "ROSSO") tipoVino = "Rosso";
+                else if (upper.includes("SPUMANTE") || upper === "SPUMANTE") tipoVino = "Spumante";
+                else if (upper.includes("ROSATO") || upper === "ROSATO" || upper === "ROSE'") tipoVino = "Rosato";
+                else if (upper.includes("DOLCE") || upper === "DOLCE") tipoVino = "Dolce";
+                else if (tipoRaw === "●") tipoVino = "Special/Set";
+                else tipoVino = tipoRaw;
+            }
+
+            let descrizione = (row[colIdx.descrizione] !== undefined) ? row[colIdx.descrizione].toString().trim() : "";
+            let formato = (row[colIdx.formato] !== undefined) ? row[colIdx.formato].toString().trim() : "";
+            let qxcRaw = (row[colIdx.qxc] !== undefined && row[colIdx.qxc] !== "") ? row[colIdx.qxc] : "";
+            let prezzoRaw = (row[colIdx.prezzo] !== undefined && row[colIdx.prezzo] !== "") ? row[colIdx.prezzo] : "";
+            let link = (row[colIdx.link] !== undefined) ? row[colIdx.link].toString().trim() : "";
+
+            let qxcNum = null;
+            let prezzoNum = null;
+            if (qxcRaw !== "") {
+                const parsedQ = parseFloat(qxcRaw.toString().replace(',', '.'));
+                if (!isNaN(parsedQ)) qxcNum = parsedQ;
+            }
+            if (prezzoRaw !== "") {
+                const parsedP = parseFloat(prezzoRaw.toString().replace(',', '.'));
+                if (!isNaN(parsedP)) prezzoNum = parsedP;
+            }
+            let prezzoCartone = (qxcNum !== null && prezzoNum !== null) ? qxcNum * prezzoNum : null;
+
+            let aziendaFull = currentAziendaFull;
+            if (!aziendaFull && firstCol && !regioniConosciute.has(firstCol.toUpperCase())) {
+                aziendaFull = firstCol;
+            }
+            if (!aziendaFull) aziendaFull = "Cantina non specificata";
+
+            const regioneProdotto = currentRegione || (firstCol && regioniConosciute.has(firstCol.toUpperCase()) ? firstCol : "");
+
+            prodottiTemp.push({
+                regione: regioneProdotto,
+                aziendaFull: aziendaFull,
+                cantinaShort: extractShortCantina(aziendaFull),
+                codArt: codice,
+                tipoVino: tipoVino,
+                descrizione: descrizione,
+                formato: formato,
+                qxc: qxcNum,
+                prezzoBottiglia: prezzoNum,
+                prezzoCartone: prezzoCartone,
+                link: link
+            });
+        }
+
+        if (prodottiTemp.length === 0) throw new Error("Nessun prodotto valido trovato");
+        prodotti = prodottiTemp;
+        selectedIndices.clear();
+        refreshFilterOptions();
+        applyFilters();
+        showMessage(`✅ Caricati ${prodotti.length} vini. Clicca sul nome per il PDF/link.`);
+        statsSpan.innerText = `📂 Caricati ${prodotti.length} vini — usa i filtri per esplorare`;
+        // Nascondi l'area di upload manuale se era visibile
+        manualUploadZone.style.display = 'none';
+    }
+
+    function handleManualFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+            try {
+                parseExcelRows(rows);
+            } catch (err) {
+                alert("Errore nel parsing del file: " + err.message);
+            }
+        };
+        reader.onerror = () => alert("Errore lettura file");
+        reader.readAsArrayBuffer(file);
+    }
+
+    function triggerManualUpload() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx, .xls';
+        input.onchange = (e) => {
+            if(e.target.files[0]) handleManualFile(e.target.files[0]);
+        };
+        input.click();
+    }
+
+    // Tentativo di caricamento automatico
+    async function loadExcelFromUrl(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const arrayBuffer = await response.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+            if (!rows || rows.length < 2) throw new Error("File vuoto");
+            parseExcelRows(rows);
+        } catch (err) {
+            console.error(err);
+            statsSpan.innerText = "❌ File automatico non trovato";
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center">⚠️ Caricamento automatico fallito.</td></tr>';
+            // Mostra l'area per l'upload manuale
+            manualUploadZone.style.display = 'block';
+            showMessage("Caricamento automatico fallito. Seleziona manualmente il file Excel.", true);
+        }
+    }
+
+    // Event listeners
+    filterRegione.addEventListener('change', () => applyFilters());
+    filterAzienda.addEventListener('change', () => applyFilters());
+    filterTipo.addEventListener('change', () => applyFilters());
+    filterFormato.addEventListener('change', () => applyFilters());
+    searchInput.addEventListener('input', () => applyFilters());
+    resetBtn.addEventListener('click', resetFilters);
+    selectAllBtn.addEventListener('click', selectAllFiltered);
+    deselectAllBtn.addEventListener('click', deselectAll);
+    whatsappBtn.addEventListener('click', shareWhatsApp);
+    manualUploadBtn.addEventListener('click', triggerManualUpload);
+
+    // Avvio
+    loadExcelFromUrl('listavino.xlsx');
+</script>
+</body>
+</html>
