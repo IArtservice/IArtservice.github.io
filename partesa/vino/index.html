@@ -608,26 +608,27 @@
         showMessage("Filtri azzerati");
     }
 
+    // ===== MODIFICA QUI: nuovo formato per WhatsApp (solo codice + descrizione, tabulati) =====
     function getSelectedTextForWhatsApp() {
         if (selectedIndices.size === 0) {
             alert("⚠️ Nessun prodotto selezionato. Seleziona almeno un vino.");
             return null;
         }
         let lines = [];
-        lines.push(`📋 *LISTINO VINI SELEZIONATO* (${selectedIndices.size} prodotti)`);
-        lines.push(`───────────────────`);
+        // Intestazione per Excel: due colonne "Codice" e "Descrizione"
+        lines.push("Codice\tDescrizione");
         for (let idx of selectedIndices) {
             const p = prodotti[idx];
-            const descr = p.descrizione || '—';
             const cod = p.codArt || '';
-            const formato = p.formato || '';
-            const prezzoBott = (p.prezzoBottiglia != null && !isNaN(p.prezzoBottiglia)) ? `€ ${p.prezzoBottiglia.toFixed(2)}` : '—';
-            lines.push(`📌 ${cod} — ${descr} (${formato}) | ${prezzoBott}/bt`);
+            let descr = p.descrizione || '';
+            // Rimuove eventuali tab, newline o ritorni a capo che romperebbero il formato
+            descr = descr.replace(/[\t\n\r]/g, ' ');
+            lines.push(`${cod}\t${descr}`);
         }
-        lines.push(`───────────────────`);
-        lines.push(`🔗 Generato dal selettore vini Horeca`);
+        // Il testo generato, incollato in Excel, creerà automaticamente due colonne.
         return lines.join("\n");
     }
+    // =========================================================================
 
     function shareWhatsApp() {
         const text = getSelectedTextForWhatsApp();
