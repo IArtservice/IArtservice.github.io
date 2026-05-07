@@ -186,7 +186,6 @@
             z-index: 1000;
             cursor: pointer;
         }
-        /* Il cerchio con icona */
         .wa-circle {
             width: 56px;
             height: 56px;
@@ -208,7 +207,6 @@
         .wa-circle:active {
             transform: scale(0.96);
         }
-        /* Testo affiancato */
         .wa-text {
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(6px);
@@ -227,7 +225,6 @@
             background: #25D366;
             transform: translateX(-4px);
         }
-        /* Su schermi piccoli riduci le dimensioni ma mantieni leggibilità */
         @media (max-width: 600px) {
             .wa-circle {
                 width: 48px;
@@ -265,8 +262,8 @@
             </select>
         </div>
         <div class="filter-group">
-            <label>Cerca</label>
-            <input type="text" id="searchInput" class="search-input" placeholder="Codice o nome...">
+            <label>Cerca (codice o nome)</label>
+            <input type="text" id="searchInput" class="search-input" placeholder="Es. rosso, 123...">
         </div>
         <div class="filter-group">
             <label>&nbsp;</label>
@@ -282,7 +279,7 @@
                 <tr><th class="checkbox-col">✔</th><th>Codice</th><th>Descrizione</th><th>Mis.</th><th>UDM</th><th>UM</th><th>Categoria</th><th>Segmento</th></tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="8" style="text-align:center">Caricamento in corso...<br>Se non vedi i prodotti, aggiorna la pagina.}</td></tr>
+                <tr><td colspan="8" style="text-align:center">Caricamento in corso...<br>Se non vedi i prodotti, aggiorna la pagina.</td></tr>
             </tbody>
         </table>
     </div>
@@ -294,19 +291,19 @@
     <div id="infoMsg"></div>
 </div>
 
-<!-- PULSANTE WHATSAPP: cerchio + testo affiancato, sempre visibile, non invasivo -->
+<!-- PULSANTE WHATSAPP -->
 <div id="whatsappWrapper" class="whatsapp-wrapper">
     <div class="wa-circle">📱</div>
     <div class="wa-text">Invia su WhatsApp</div>
 </div>
 
 <script>
-    // ---------- Variabili (TUTTO IDENTICO ALL'ORIGINALE) ----------
-    let prodotti = [];
-    let filteredIndices = [];
+    // ---------- Variabili ----------
+    let prodotti = [];            // array completo degli oggetti prodotto
+    let filteredIndices = [];     // indici dei prodotti che superano i filtri attuali
     let selectedIndices = new Set();
 
-    // DOM
+    // DOM elements
     const filterCategoria = document.getElementById('filterCategoria');
     const filterSegmento = document.getElementById('filterSegmento');
     const searchInput = document.getElementById('searchInput');
@@ -319,79 +316,109 @@
     const infoMsgDiv = document.getElementById('infoMsg');
 
     const WHATSAPP_NUMBER = "393331395730";
+    let isUpdatingDropdowns = false;   // flag per evitare loop di eventi
 
+    // Helper messaggi
     function showMessage(msg, isError = false) {
         infoMsgDiv.innerHTML = `<div class="info-message ${isError ? 'error-message' : ''}">${msg}</div>`;
         setTimeout(() => infoMsgDiv.innerHTML = "", 4000);
     }
 
-    function updateFilterOptions() {
+    // Escape per HTML (sicurezza)
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+
+    // --- Funzione principale che ricostruisce i filtri a discesa (Categoria e Segmento)
+    // basandosi ESCLUSIVAMENTE sui prodotti attualmente filtrati (filteredIndices)
+    function refreshDropdownsFromCurrentFilter() {
+        if (isUpdatingDropdowns) return;
+        isUpdatingDropdowns = true;
+
+        // Raccogliere i valori unici di categoria e segmento dai prodotti filtrati
+        const categorieSet = new Set();
+        const segmentiSet = new Set();
+
+        for (let idx of filteredIndices) {
+            const p = prodotti[idx];
+            if (p.categoria && p.categoria.trim() !== "") categorieSet.add(p.categoria.trim());
+            if (p.segmento && p.segmento.trim() !== "") segmentiSet.add(p.segmento.trim());
+        }
+
+        // Mantieni il valore attualmente selezionato (se ancora presente nel nuovo set)
         const currentCat = filterCategoria.value;
         const currentSeg = filterSegmento.value;
 
-        let allCategorie = new Set();
-        let allSegmenti = new Set();
-        let catToSeg = new Map();
-        let segToCat = new Map();
-
-        for (const p of prodotti) {
-            const cat = p.categoria || "";
-            const seg = p.segmento || "";
-            if (cat) allCategorie.add(cat);
-            if (seg) allSegmenti.add(seg);
-            if (cat && seg) {
-                if (!catToSeg.has(cat)) catToSeg.set(cat, new Set());
-                catToSeg.get(cat).add(seg);
-                if (!segToCat.has(seg)) segToCat.set(seg, new Set());
-                segToCat.get(seg).add(cat);
-            }
-        }
-
-        let categorieDaMostrare = new Set(allCategorie);
-        if (currentSeg && segToCat.has(currentSeg)) {
-            categorieDaMostrare = segToCat.get(currentSeg);
-        }
+        // Ricostruisci opzioni categoria
         let catHtml = '<option value="">Tutte</option>';
-        for (let c of [...categorieDaMostrare].sort()) {
-            catHtml += `<option value="${escapeHtml(c)}" ${currentCat === c ? 'selected' : ''}>${escapeHtml(c)}</option>`;
+        const sortedCats = Array.from(categorieSet).sort((a,b) => a.localeCompare(b));
+        for (let cat of sortedCats) {
+            const selectedAttr = (currentCat === cat) ? 'selected' : '';
+            catHtml += `<option value="${escapeHtml(cat)}" ${selectedAttr}>${escapeHtml(cat)}</option>`;
         }
         filterCategoria.innerHTML = catHtml;
 
-        let segmentiDaMostrare = new Set(allSegmenti);
-        if (currentCat && catToSeg.has(currentCat)) {
-            segmentiDaMostrare = catToSeg.get(currentCat);
-        }
+        // Ricostruisci opzioni segmento
         let segHtml = '<option value="">Tutti</option>';
-        for (let s of [...segmentiDaMostrare].sort()) {
-            segHtml += `<option value="${escapeHtml(s)}" ${currentSeg === s ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+        const sortedSegs = Array.from(segmentiSet).sort((a,b) => a.localeCompare(b));
+        for (let seg of sortedSegs) {
+            const selectedAttr = (currentSeg === seg) ? 'selected' : '';
+            segHtml += `<option value="${escapeHtml(seg)}" ${selectedAttr}>${escapeHtml(seg)}</option>`;
         }
         filterSegmento.innerHTML = segHtml;
+
+        // Piccola accortezza: se dopo rebuild il valore selezionato non esiste più, forza a "" 
+        // (ma l'eventuale selezione non valida verrà già sistemata al prossimo applyFilters)
+        if (currentCat !== "" && !categorieSet.has(currentCat)) {
+            filterCategoria.value = "";
+        }
+        if (currentSeg !== "" && !segmentiSet.has(currentSeg)) {
+            filterSegmento.value = "";
+        }
+
+        isUpdatingDropdowns = false;
     }
 
+    // --- Applica tutti i filtri (categoria, segmento, ricerca) e aggiorna la tabella + dropdown
     function applyFilters() {
+        if (!prodotti.length) {
+            filteredIndices = [];
+            renderTable();
+            refreshDropdownsFromCurrentFilter();  // dropdown vuoti
+            return;
+        }
+
         const catValue = filterCategoria.value;
         const segValue = filterSegmento.value;
         const searchTerm = searchInput.value.trim().toLowerCase();
 
-        filteredIndices = [];
+        const newFiltered = [];
         for (let i = 0; i < prodotti.length; i++) {
             const p = prodotti[i];
             let ok = true;
-            if (catValue && p.categoria !== catValue) ok = false;
-            if (segValue && p.segmento !== segValue) ok = false;
+            if (catValue && (p.categoria || "") !== catValue) ok = false;
+            if (segValue && (p.segmento || "") !== segValue) ok = false;
             if (searchTerm) {
                 const codMatch = (p.codArt || "").toLowerCase().includes(searchTerm);
                 const descMatch = (p.descrizione || "").toLowerCase().includes(searchTerm);
                 if (!codMatch && !descMatch) ok = false;
             }
-            if (ok) filteredIndices.push(i);
+            if (ok) newFiltered.push(i);
         }
+        filteredIndices = newFiltered;
+
+        // --- IMPORTANTE: rigenera le opzioni di categoria e segmento basate solo sui prodotti filtrati ---
+        refreshDropdownsFromCurrentFilter();
+
+        // Infine ridisegna la tabella
         renderTable();
     }
 
+    // --- Render della tabella (usa filteredIndices e selectedIndices)
     function renderTable() {
         if (!prodotti.length) {
-            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.}</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.</td></tr>';
             statsSpan.innerText = 'Nessun prodotto';
             return;
         }
@@ -403,23 +430,28 @@
             const row = document.createElement('tr');
             if (isSelected) row.classList.add('selected-row');
 
+            // checkbox
             const tdCheck = document.createElement('td');
             tdCheck.classList.add('checkbox-col');
             const chk = document.createElement('input');
             chk.type = 'checkbox';
             chk.checked = isSelected;
-            chk.addEventListener('change', () => {
-                if (chk.checked) selectedIndices.add(idx);
-                else selectedIndices.delete(idx);
-                renderTable();
-            });
+            chk.addEventListener('change', (function(i) {
+                return function(e) {
+                    if (e.target.checked) selectedIndices.add(i);
+                    else selectedIndices.delete(i);
+                    renderTable();    // refresh per aggiornare classe e selezione
+                };
+            })(idx));
             tdCheck.appendChild(chk);
             row.appendChild(tdCheck);
 
+            // codice
             const tdCod = document.createElement('td');
             tdCod.textContent = p.codArt || '';
             row.appendChild(tdCod);
 
+            // descrizione (con link se presente)
             const tdDesc = document.createElement('td');
             const descText = p.descrizione || '';
             if (p.link && p.link.trim() !== '') {
@@ -435,6 +467,7 @@
             }
             row.appendChild(tdDesc);
 
+            // misura
             const tdMis = document.createElement('td');
             tdMis.textContent = p.misura || '';
             row.appendChild(tdMis);
@@ -462,33 +495,50 @@
         statsSpan.innerHTML = `📊 ${totalFiltered} prodotti — ✅ selezionati: ${selectedCount} (totale ${prodotti.length})`;
     }
 
+    // Seleziona tutti i prodotti attualmente filtrati
     function selectAllFiltered() {
         for (let idx of filteredIndices) selectedIndices.add(idx);
         renderTable();
+        showMessage(`✅ Selezionati ${filteredIndices.length} prodotti (solo quelli visibili)`);
     }
+
     function deselectAll() {
         selectedIndices.clear();
         renderTable();
+        showMessage("❌ Deselezionati tutti i prodotti");
     }
 
+    // Reset completo di tutti i filtri (categoria, segmento, ricerca)
     function resetFilters() {
+        // Evita trigger durante reset
+        isUpdatingDropdowns = true;
         filterCategoria.value = "";
         filterSegmento.value = "";
         searchInput.value = "";
-        updateFilterOptions();
-        applyFilters();
-        showMessage("Filtri resettati");
+        isUpdatingDropdowns = false;
+        
+        // Ricalcola filtrati (ora nessun filtro attivo) => tutti i prodotti
+        if (prodotti.length) {
+            filteredIndices = prodotti.map((_, idx) => idx);
+        } else {
+            filteredIndices = [];
+        }
+        // Aggiorna i dropdown in base ai prodotti totali
+        refreshDropdownsFromCurrentFilter();
+        renderTable();
+        showMessage("Filtri resettati, visualizzati tutti i prodotti");
     }
 
+    // --- Condivisione WhatsApp: estrae i prodotti selezionati
     function getSelectedText() {
         if (selectedIndices.size === 0) {
             alert("Nessun prodotto selezionato.");
             return null;
         }
-        let lines = [];
+        const lines = [];
         for (let idx of selectedIndices) {
             const p = prodotti[idx];
-            lines.push(`${p.codArt}\t${p.descrizione}`);
+            lines.push(`${p.codArt || ''}\t${p.descrizione || ''}`);
         }
         return lines.join("\n");
     }
@@ -501,11 +551,7 @@
         showMessage("📱 Aperto WhatsApp, invia il messaggio.");
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
-    }
-
+    // --- Parsing del file Excel (identico alla versione originale ma robusto)
     function parseProductData(rows, headerIndex) {
         const headers = rows[headerIndex];
         const colIdx = {
@@ -546,8 +592,9 @@
         return prodottiTemp;
     }
 
+    // Caricamento file predefinito "elenco_prodotti.xlsx"
     function loadDefaultFile() {
-        statsSpan.innerText = "Caricamento...";
+        statsSpan.innerText = "Caricamento in corso...";
         fetch('elenco_prodotti.xlsx')
             .then(response => {
                 if (!response.ok) throw new Error(`File non trovato (${response.status})`);
@@ -570,18 +617,23 @@
                 const prodottiTemp = parseProductData(rows, headerIndex);
                 prodotti = prodottiTemp;
                 selectedIndices.clear();
+                
+                // Inizializza: nessun filtro attivo, mostra tutti i prodotti
                 filterCategoria.value = "";
                 filterSegmento.value = "";
                 searchInput.value = "";
-                updateFilterOptions();
-                applyFilters();
+                filteredIndices = prodotti.map((_, idx) => idx);
+                
+                // Aggiorna dropdown in base a TUTTI i prodotti (stato iniziale)
+                refreshDropdownsFromCurrentFilter();
+                renderTable();
                 showMessage(`✅ Caricati ${prodotti.length} prodotti. Clicca sul nome per aprire il link.`);
             })
             .catch(error => {
                 console.error(error);
                 statsSpan.innerText = "File non trovato";
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">⚠️ File "elenco_prodotti.xlsx" non trovato. Verifica che sia nella stessa cartella.}</td></tr>`;
-                showMessage("File predefinito mancante. Carica manualmente usando il pulsante qui sotto (se visibile)", true);
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">⚠️ File "elenco_prodotti.xlsx" non trovato. Verifica che sia nella stessa cartella.</td></tr>`;
+                showMessage("File predefinito mancante. Carica manualmente usando il pulsante qui sotto", true);
                 if (!document.getElementById('fallbackUpload')) {
                     const fallbackDiv = document.createElement('div');
                     fallbackDiv.style.margin = "12px 0";
@@ -591,9 +643,14 @@
                         if (e.target.files[0]) handleManualUpload(e.target.files[0]);
                     });
                 }
+                // In caso di fallback, assicuriamo array vuoto
+                prodotti = [];
+                filteredIndices = [];
+                renderTable();
             });
     }
 
+    // Gestione upload manuale
     function handleManualUpload(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -614,8 +671,9 @@
                 filterCategoria.value = "";
                 filterSegmento.value = "";
                 searchInput.value = "";
-                updateFilterOptions();
-                applyFilters();
+                filteredIndices = prodotti.map((_, idx) => idx);
+                refreshDropdownsFromCurrentFilter();
+                renderTable();
                 showMessage(`✅ Caricati ${prodotti.length} prodotti da file manuale. Clicca sul nome per aprire il link.`);
             } catch (err) {
                 alert("Errore nel parsing: " + err.message);
@@ -625,15 +683,28 @@
         reader.readAsArrayBuffer(file);
     }
 
-    // Event listeners IDENTICI
-    filterCategoria.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
-    filterSegmento.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
-    searchInput.addEventListener('input', applyFilters);
+    // --- Event listeners con gestione del flag per evitare loop ---
+    function onCategoryChange() {
+        if (isUpdatingDropdowns) return;
+        applyFilters();
+    }
+    function onSegmentChange() {
+        if (isUpdatingDropdowns) return;
+        applyFilters();
+    }
+    function onSearchInput() {
+        applyFilters();
+    }
+
+    filterCategoria.addEventListener('change', onCategoryChange);
+    filterSegmento.addEventListener('change', onSegmentChange);
+    searchInput.addEventListener('input', onSearchInput);
     resetBtn.addEventListener('click', resetFilters);
     selectAllBtn.addEventListener('click', selectAllFiltered);
     deselectAllBtn.addEventListener('click', deselectAll);
     waWrapper.addEventListener('click', shareTextWhatsApp);
 
+    // Avvio
     loadDefaultFile();
 </script>
 </body>
