@@ -374,6 +374,7 @@
     let prodotti = [];
     let filteredIndices = [];
     let selectedIndices = new Set();
+    let isUpdatingDropdowns = false;   // flag per evitare loop
 
     // DOM elements
     const filterRegione = document.getElementById('filterRegione');
@@ -417,61 +418,87 @@
         return fullName;
     }
 
-    function refreshFilterOptions() {
-        const currentRegione = filterRegione.value;
-        const currentAzienda = filterAzienda.value;
-        const currentTipo = filterTipo.value;
-        const currentFormato = filterFormato.value;
+    // ===== NUOVA FUNZIONE: aggiorna i dropdown basandosi ESCLUSIVAMENTE sui prodotti filtrati (filteredIndices) =====
+    function refreshDropdownsFromFilteredIndices() {
+        if (isUpdatingDropdowns) return;
+        isUpdatingDropdowns = true;
 
-        let regioniSet = new Set();
-        let aziendeSet = new Set();
-        let tipiSet = new Set();
-        let formatiSet = new Set();
+        // Raccogli valori presenti SOLO nei prodotti attualmente visibili
+        const regioniSet = new Set();
+        const aziendeSet = new Set();
+        const tipiSet = new Set();
+        const formatiSet = new Set();
 
-        for (const p of prodotti) {
+        for (let idx of filteredIndices) {
+            const p = prodotti[idx];
             if (p.regione && p.regione.trim()) regioniSet.add(p.regione);
             if (p.aziendaFull && p.aziendaFull.trim()) aziendeSet.add(p.aziendaFull);
             if (p.tipoVino && p.tipoVino.trim()) tipiSet.add(p.tipoVino);
             if (p.formato && p.formato.trim()) formatiSet.add(p.formato);
         }
 
-        let regioniArr = Array.from(regioniSet).sort((a,b) => a.localeCompare(b, 'it'));
+        // Mantieni i valori attualmente selezionati solo se ancora validi
+        let currentRegione = filterRegione.value;
+        let currentAzienda = filterAzienda.value;
+        let currentTipo = filterTipo.value;
+        let currentFormato = filterFormato.value;
+
+        if (currentRegione !== "" && !regioniSet.has(currentRegione)) currentRegione = "";
+        if (currentAzienda !== "" && !aziendeSet.has(currentAzienda)) currentAzienda = "";
+        if (currentTipo !== "" && !tipiSet.has(currentTipo)) currentTipo = "";
+        if (currentFormato !== "" && !formatiSet.has(currentFormato)) currentFormato = "";
+
+        // Ricostruisci menu Regione
         let htmlRegione = '<option value="">Tutte</option>';
-        for (let r of regioniArr) {
+        const sortedRegioni = Array.from(regioniSet).sort((a,b) => a.localeCompare(b, 'it'));
+        for (let r of sortedRegioni) {
             htmlRegione += `<option value="${escapeHtml(r)}" ${currentRegione === r ? 'selected' : ''}>${escapeHtml(r)}</option>`;
         }
         filterRegione.innerHTML = htmlRegione;
 
-        let aziendeArr = Array.from(aziendeSet).sort((a,b) => a.localeCompare(b, 'it'));
+        // Ricostruisci menu Azienda
         let htmlAzienda = '<option value="">Tutte</option>';
-        for (let az of aziendeArr) {
+        const sortedAziende = Array.from(aziendeSet).sort((a,b) => a.localeCompare(b, 'it'));
+        for (let az of sortedAziende) {
             htmlAzienda += `<option value="${escapeHtml(az)}" ${currentAzienda === az ? 'selected' : ''}>${escapeHtml(az)}</option>`;
         }
         filterAzienda.innerHTML = htmlAzienda;
 
-        let tipiArr = Array.from(tipiSet).sort();
+        // Ricostruisci menu Tipo Vino
         let htmlTipo = '<option value="">Tutti</option>';
-        for (let t of tipiArr) {
+        const sortedTipi = Array.from(tipiSet).sort();
+        for (let t of sortedTipi) {
             htmlTipo += `<option value="${escapeHtml(t)}" ${currentTipo === t ? 'selected' : ''}>${escapeHtml(t)}</option>`;
         }
         filterTipo.innerHTML = htmlTipo;
 
-        let formatiArr = Array.from(formatiSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+        // Ricostruisci menu Formato
         let htmlFormato = '<option value="">Tutti</option>';
-        for (let f of formatiArr) {
+        const sortedFormati = Array.from(formatiSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+        for (let f of sortedFormati) {
             htmlFormato += `<option value="${escapeHtml(f)}" ${currentFormato === f ? 'selected' : ''}>${escapeHtml(f)}</option>`;
         }
         filterFormato.innerHTML = htmlFormato;
+
+        isUpdatingDropdowns = false;
     }
 
+    // ===== FUNZIONE PRINCIPALE APPLICA FILTRI (RICHIAMATA OGNI VOLTA) =====
     function applyFilters() {
+        if (!prodotti.length) {
+            filteredIndices = [];
+            refreshDropdownsFromFilteredIndices();
+            renderTable();
+            return;
+        }
+
         const regioneVal = filterRegione.value;
         const aziendaVal = filterAzienda.value;
         const tipoVal = filterTipo.value;
         const formatoVal = filterFormato.value;
         const searchTerm = searchInput.value.trim().toLowerCase();
 
-        filteredIndices = [];
+        const newFiltered = [];
         for (let i = 0; i < prodotti.length; i++) {
             const p = prodotti[i];
             let ok = true;
@@ -484,8 +511,14 @@
                 const descMatch = (p.descrizione || "").toLowerCase().includes(searchTerm);
                 if (!codeMatch && !descMatch) ok = false;
             }
-            if (ok) filteredIndices.push(i);
+            if (ok) newFiltered.push(i);
         }
+        filteredIndices = newFiltered;
+
+        // DOPO aver calcolato i nuovi filtrati, aggiorna i dropdown in modo che mostrino solo i valori presenti tra questi
+        refreshDropdownsFromFilteredIndices();
+
+        // Ridisegna la tabella
         renderTable();
     }
 
@@ -603,32 +636,28 @@
         filterTipo.value = "";
         filterFormato.value = "";
         searchInput.value = "";
-        refreshFilterOptions();
+        // Ora applica i filtri (con dropdown vuoti ricalcolati automaticamente)
         applyFilters();
         showMessage("Filtri azzerati");
     }
 
-    // ===== MODIFICA QUI: nuovo formato per WhatsApp (solo codice + descrizione, tabulati) =====
+    // ===== FORMATO WHATSAPP (solo codice + descrizione, tabulati) =====
     function getSelectedTextForWhatsApp() {
         if (selectedIndices.size === 0) {
             alert("⚠️ Nessun prodotto selezionato. Seleziona almeno un vino.");
             return null;
         }
         let lines = [];
-        // Intestazione per Excel: due colonne "Codice" e "Descrizione"
         lines.push("Codice\tDescrizione");
         for (let idx of selectedIndices) {
             const p = prodotti[idx];
             const cod = p.codArt || '';
             let descr = p.descrizione || '';
-            // Rimuove eventuali tab, newline o ritorni a capo che romperebbero il formato
             descr = descr.replace(/[\t\n\r]/g, ' ');
             lines.push(`${cod}\t${descr}`);
         }
-        // Il testo generato, incollato in Excel, creerà automaticamente due colonne.
         return lines.join("\n");
     }
-    // =========================================================================
 
     function shareWhatsApp() {
         const text = getSelectedTextForWhatsApp();
@@ -638,7 +667,7 @@
         showMessage(`📲 Aperto WhatsApp - invia il messaggio precompilato`);
     }
 
-    // ---------- PARSING EXCEL ----------
+    // ---------- PARSING EXCEL (IDENTICO ALL'ORIGINALE, MA CON PRESERVAZIONE DELLA LOGICA) ----------
     function parseExcelRows(rows) {
         let headerIndex = -1;
         for (let i = 0; i < Math.min(rows.length, 40); i++) {
@@ -750,8 +779,12 @@
         if (prodottiTemp.length === 0) throw new Error("Nessun prodotto valido trovato");
         prodotti = prodottiTemp;
         selectedIndices.clear();
-        refreshFilterOptions();
-        applyFilters();
+        
+        // Inizializza filteredIndices con tutti i prodotti
+        filteredIndices = prodotti.map((_, idx) => idx);
+        // Aggiorna i dropdown in base a tutti i prodotti (stato iniziale)
+        refreshDropdownsFromFilteredIndices();
+        renderTable();
         showMessage(`✅ Caricati ${prodotti.length} vini. Clicca sul nome per il PDF/link.`);
         statsSpan.innerText = `📂 Caricati ${prodotti.length} vini — usa i filtri per esplorare`;
         manualUploadZone.style.display = 'none';
@@ -803,7 +836,7 @@
         }
     }
 
-    // Event listeners
+    // Event listeners (NOTA: Non serve più chiamare refreshFilterOptions esternamente, perché applyFilters già aggiorna i dropdown)
     filterRegione.addEventListener('change', () => applyFilters());
     filterAzienda.addEventListener('change', () => applyFilters());
     filterTipo.addEventListener('change', () => applyFilters());
