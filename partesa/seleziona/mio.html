@@ -262,8 +262,8 @@
 
 <script>
     // ---------- Variabili ----------
-    let prodotti = [];
-    let filteredIndices = [];
+    let prodotti = [];              // array completo degli oggetti prodotto
+    let filteredIndices = [];       // indici dei prodotti che superano tutti i filtri attuali
     let selectedIndices = new Set();
 
     // DOM
@@ -283,78 +283,94 @@
     const WHATSAPP_NUMBER = "393331395730";
     const EMAIL_TO = "iartservizi@gmail.com";
 
+    let isRefreshingDropdowns = false;   // evita loop durante l'aggiornamento dei dropdown
+
     function showMessage(msg, isError = false) {
         infoMsgDiv.innerHTML = `<div class="info-message ${isError ? 'error-message' : ''}">${msg}</div>`;
         setTimeout(() => infoMsgDiv.innerHTML = "", 4000);
     }
 
-    // aggiorna i menu a tendina in base ai dati presenti (e ai filtri attivi)
-    function updateFilterOptions() {
-        const currentCat = filterCategoria.value;
-        const currentSeg = filterSegmento.value;
+    // --- NUOVA FUNZIONE: aggiorna i menu a tendina (Categoria e Segmento)
+    // basandosi ESCLUSIVAMENTE sui prodotti attualmente filtrati (filteredIndices)
+    // In questo modo, quando l'utente digita "rosso" nella ricerca, i dropdown mostreranno
+    // solo le categorie e i segmenti presenti tra i prodotti che contengono "rosso"
+    function refreshDropdownsFromFilteredIndices() {
+        if (isRefreshingDropdowns) return;
+        isRefreshingDropdowns = true;
 
-        let allCategorie = new Set();
-        let allSegmenti = new Set();
-        let catToSeg = new Map();
-        let segToCat = new Map();
+        // Raccogli i valori unici di categoria e segmento dai soli prodotti filtrati
+        const categorieSet = new Set();
+        const segmentiSet = new Set();
 
-        for (const p of prodotti) {
-            const cat = p.categoria || "";
-            const seg = p.segmento || "";
-            if (cat) allCategorie.add(cat);
-            if (seg) allSegmenti.add(seg);
-            if (cat && seg) {
-                if (!catToSeg.has(cat)) catToSeg.set(cat, new Set());
-                catToSeg.get(cat).add(seg);
-                if (!segToCat.has(seg)) segToCat.set(seg, new Set());
-                segToCat.get(seg).add(cat);
-            }
+        for (let idx of filteredIndices) {
+            const p = prodotti[idx];
+            if (p.categoria && p.categoria.trim() !== "") categorieSet.add(p.categoria.trim());
+            if (p.segmento && p.segmento.trim() !== "") segmentiSet.add(p.segmento.trim());
         }
 
-        let categorieDaMostrare = new Set(allCategorie);
-        if (currentSeg && segToCat.has(currentSeg)) {
-            categorieDaMostrare = segToCat.get(currentSeg);
-        }
+        // Valori attualmente selezionati
+        let currentCat = filterCategoria.value;
+        let currentSeg = filterSegmento.value;
+
+        // Se il valore selezionato non esiste più nel nuovo insieme, resettalo a ""
+        if (currentCat !== "" && !categorieSet.has(currentCat)) currentCat = "";
+        if (currentSeg !== "" && !segmentiSet.has(currentSeg)) currentSeg = "";
+
+        // Ricostruisci le opzioni per Categoria
         let catHtml = '<option value="">Tutte</option>';
-        for (let c of [...categorieDaMostrare].sort()) {
-            catHtml += `<option value="${escapeHtml(c)}" ${currentCat === c ? 'selected' : ''}>${escapeHtml(c)}</option>`;
+        const sortedCats = Array.from(categorieSet).sort((a,b) => a.localeCompare(b));
+        for (let cat of sortedCats) {
+            catHtml += `<option value="${escapeHtml(cat)}" ${currentCat === cat ? 'selected' : ''}>${escapeHtml(cat)}</option>`;
         }
         filterCategoria.innerHTML = catHtml;
 
-        let segmentiDaMostrare = new Set(allSegmenti);
-        if (currentCat && catToSeg.has(currentCat)) {
-            segmentiDaMostrare = catToSeg.get(currentCat);
-        }
+        // Ricostruisci le opzioni per Segmento
         let segHtml = '<option value="">Tutti</option>';
-        for (let s of [...segmentiDaMostrare].sort()) {
-            segHtml += `<option value="${escapeHtml(s)}" ${currentSeg === s ? 'selected' : ''}>${escapeHtml(s)}</option>`;
+        const sortedSegs = Array.from(segmentiSet).sort((a,b) => a.localeCompare(b));
+        for (let seg of sortedSegs) {
+            segHtml += `<option value="${escapeHtml(seg)}" ${currentSeg === seg ? 'selected' : ''}>${escapeHtml(seg)}</option>`;
         }
         filterSegmento.innerHTML = segHtml;
+
+        isRefreshingDropdowns = false;
     }
 
-    // applica filtri (testo, categoria, segmento)
+    // --- Applica tutti i filtri (categoria, segmento, ricerca) e aggiorna la tabella + dropdown
     function applyFilters() {
+        if (!prodotti.length) {
+            filteredIndices = [];
+            refreshDropdownsFromFilteredIndices();  // dropdown vuoti
+            renderTable();
+            return;
+        }
+
         const catValue = filterCategoria.value;
         const segValue = filterSegmento.value;
         const searchTerm = searchInput.value.trim().toLowerCase();
 
-        filteredIndices = [];
+        const newFiltered = [];
         for (let i = 0; i < prodotti.length; i++) {
             const p = prodotti[i];
             let ok = true;
-            if (catValue && p.categoria !== catValue) ok = false;
-            if (segValue && p.segmento !== segValue) ok = false;
+            if (catValue && (p.categoria || "") !== catValue) ok = false;
+            if (segValue && (p.segmento || "") !== segValue) ok = false;
             if (searchTerm) {
                 const codMatch = (p.codArt || "").toLowerCase().includes(searchTerm);
                 const descMatch = (p.descrizione || "").toLowerCase().includes(searchTerm);
                 if (!codMatch && !descMatch) ok = false;
             }
-            if (ok) filteredIndices.push(i);
+            if (ok) newFiltered.push(i);
         }
+        filteredIndices = newFiltered;
+
+        // IMPORTANTE: rigenera le opzioni di categoria e segmento basate solo sui prodotti filtrati
+        refreshDropdownsFromFilteredIndices();
+
+        // Ridisegna la tabella
         renderTable();
     }
 
-    // crea la tabella: la colonna "Descrizione" diventa cliccabile (link se presente nell'Excel)
+    // --- Render della tabella (usa filteredIndices e selectedIndices)
     function renderTable() {
         if (!prodotti.length) {
             tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center">Nessun prodotto caricato.</td></tr>';
@@ -375,11 +391,13 @@
             const chk = document.createElement('input');
             chk.type = 'checkbox';
             chk.checked = isSelected;
-            chk.addEventListener('change', () => {
-                if (chk.checked) selectedIndices.add(idx);
-                else selectedIndices.delete(idx);
-                renderTable();
-            });
+            chk.addEventListener('change', (function(i) {
+                return function(e) {
+                    if (e.target.checked) selectedIndices.add(i);
+                    else selectedIndices.delete(i);
+                    renderTable();   // refresh per aggiornare la classe e il contatore
+                };
+            })(idx));
             tdCheck.appendChild(chk);
             row.appendChild(tdCheck);
 
@@ -439,22 +457,26 @@
     function selectAllFiltered() {
         for (let idx of filteredIndices) selectedIndices.add(idx);
         renderTable();
+        showMessage(`✅ Selezionati ${filteredIndices.length} prodotti (solo quelli visibili)`);
     }
+
     function deselectAll() {
         selectedIndices.clear();
         renderTable();
+        showMessage("❌ Deselezionati tutti i prodotti");
     }
 
     function resetFilters() {
+        // Reset dei valori dei filtri senza triggerare eventi
         filterCategoria.value = "";
         filterSegmento.value = "";
         searchInput.value = "";
-        updateFilterOptions();
+        // Ora ricalcola i filtri (che setterà filteredIndices = tutti i prodotti)
         applyFilters();
-        showMessage("Filtri resettati");
+        showMessage("Filtri resettati, visualizzati tutti i prodotti");
     }
 
-    // testi per WhatsApp / Email (solo codice e descrizione)
+    // --- Testi per WhatsApp / Email (solo codice e descrizione)
     function getSelectedText() {
         if (selectedIndices.size === 0) {
             alert("Nessun prodotto selezionato.");
@@ -517,7 +539,7 @@
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
-    // Funzione comune per parsare il file Excel (legge anche la colonna "link")
+    // --- Parsing del file Excel (legge anche la colonna "link")
     function parseProductData(rows, headerIndex) {
         const headers = rows[headerIndex];
         const colIdx = {
@@ -558,7 +580,7 @@
         return prodottiTemp;
     }
 
-    // Carica il file predefinito "elenco_prodotti.xlsx"
+    // --- Carica il file predefinito "elenco_prodotti.xlsx"
     function loadDefaultFile() {
         statsSpan.innerText = "Caricamento...";
         fetch('elenco_prodotti.xlsx')
@@ -583,18 +605,24 @@
                 const prodottiTemp = parseProductData(rows, headerIndex);
                 prodotti = prodottiTemp;
                 selectedIndices.clear();
+
+                // Resetta i filtri (valori vuoti)
                 filterCategoria.value = "";
                 filterSegmento.value = "";
                 searchInput.value = "";
-                updateFilterOptions();
-                applyFilters();
+
+                // Inizializza filteredIndices con tutti i prodotti
+                filteredIndices = prodotti.map((_, idx) => idx);
+                // Aggiorna i dropdown in base a tutti i prodotti
+                refreshDropdownsFromFilteredIndices();
+                renderTable();
                 showMessage(`✅ Caricati ${prodotti.length} prodotti. Clicca sul nome per aprire il link.`);
             })
             .catch(error => {
                 console.error(error);
                 statsSpan.innerText = "File non trovato";
                 tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">⚠️ File "elenco_prodotti.xlsx" non trovato. Verifica che sia nella stessa cartella.</td></tr>`;
-                showMessage("File predefinito mancante. Carica manualmente usando il pulsante qui sotto (se visibile)", true);
+                showMessage("File predefinito mancante. Carica manualmente usando il pulsante qui sotto", true);
                 // mostra input file di fallback
                 if (!document.getElementById('fallbackUpload')) {
                     const fallbackDiv = document.createElement('div');
@@ -605,10 +633,13 @@
                         if (e.target.files[0]) handleManualUpload(e.target.files[0]);
                     });
                 }
+                prodotti = [];
+                filteredIndices = [];
+                renderTable();
             });
     }
 
-    // Gestione upload manuale (con link)
+    // --- Gestione upload manuale (con supporto link)
     function handleManualUpload(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -629,8 +660,9 @@
                 filterCategoria.value = "";
                 filterSegmento.value = "";
                 searchInput.value = "";
-                updateFilterOptions();
-                applyFilters();
+                filteredIndices = prodotti.map((_, idx) => idx);
+                refreshDropdownsFromFilteredIndices();
+                renderTable();
                 showMessage(`✅ Caricati ${prodotti.length} prodotti da file manuale. Clicca sul nome per aprire il link.`);
             } catch (err) {
                 alert("Errore nel parsing: " + err.message);
@@ -640,10 +672,10 @@
         reader.readAsArrayBuffer(file);
     }
 
-    // Event listeners
-    filterCategoria.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
-    filterSegmento.addEventListener('change', () => { updateFilterOptions(); applyFilters(); });
-    searchInput.addEventListener('input', applyFilters);
+    // --- Event listeners (la logica è ora semplice: ogni interazione ricalcola tutto)
+    filterCategoria.addEventListener('change', () => applyFilters());
+    filterSegmento.addEventListener('change', () => applyFilters());
+    searchInput.addEventListener('input', () => applyFilters());
     resetBtn.addEventListener('click', resetFilters);
     selectAllBtn.addEventListener('click', selectAllFiltered);
     deselectAllBtn.addEventListener('click', deselectAll);
