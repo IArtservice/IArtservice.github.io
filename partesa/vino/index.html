@@ -106,7 +106,6 @@
             background-color: #cbd7e4;
         }
 
-        /* Pulsanti selezione più piccoli */
         .action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -146,7 +145,7 @@
             overflow-x: auto;
             border-radius: 20px;
             border: 1px solid #eef2f6;
-            margin: 16px 0 24px; /* aggiunto margine inferiore per evitare sovrapposizione */
+            margin: 16px 0 24px;
             max-height: 65vh;
             overflow-y: auto;
         }
@@ -220,7 +219,6 @@
             color: #1e466e;
         }
 
-        /* WhatsApp FAB più piccolo e meno invasivo */
         .whatsapp-fab {
             position: fixed;
             bottom: 16px;
@@ -353,7 +351,7 @@
                     <th>Q.xC</th>
                     <th>€/bottiglia</th>
                     <th>€/cartone</th>
-                    <th>Codice</th>   <!-- CODICE SPOSTATO PER ULTIMO -->
+                    <th>Codice</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -374,9 +372,9 @@
     let prodotti = [];
     let filteredIndices = [];
     let selectedIndices = new Set();
-    let isUpdatingDropdowns = false;   // flag per evitare loop
+    let isUpdatingDropdowns = false;
 
-    // DOM elements
+    // DOM
     const filterRegione = document.getElementById('filterRegione');
     const filterAzienda = document.getElementById('filterAzienda');
     const filterTipo = document.getElementById('filterTipo');
@@ -418,12 +416,11 @@
         return fullName;
     }
 
-    // ===== NUOVA FUNZIONE: aggiorna i dropdown basandosi ESCLUSIVAMENTE sui prodotti filtrati (filteredIndices) =====
+    // ------- AGGIORNA DROPDOWN IN BASE AI SOLI PRODOTTI FILTRATI -------
     function refreshDropdownsFromFilteredIndices() {
         if (isUpdatingDropdowns) return;
         isUpdatingDropdowns = true;
 
-        // Raccogli valori presenti SOLO nei prodotti attualmente visibili
         const regioniSet = new Set();
         const aziendeSet = new Set();
         const tipiSet = new Set();
@@ -437,7 +434,6 @@
             if (p.formato && p.formato.trim()) formatiSet.add(p.formato);
         }
 
-        // Mantieni i valori attualmente selezionati solo se ancora validi
         let currentRegione = filterRegione.value;
         let currentAzienda = filterAzienda.value;
         let currentTipo = filterTipo.value;
@@ -448,42 +444,37 @@
         if (currentTipo !== "" && !tipiSet.has(currentTipo)) currentTipo = "";
         if (currentFormato !== "" && !formatiSet.has(currentFormato)) currentFormato = "";
 
-        // Ricostruisci menu Regione
+        // Regione
         let htmlRegione = '<option value="">Tutte</option>';
-        const sortedRegioni = Array.from(regioniSet).sort((a,b) => a.localeCompare(b, 'it'));
-        for (let r of sortedRegioni) {
+        [...regioniSet].sort((a,b) => a.localeCompare(b, 'it')).forEach(r => {
             htmlRegione += `<option value="${escapeHtml(r)}" ${currentRegione === r ? 'selected' : ''}>${escapeHtml(r)}</option>`;
-        }
+        });
         filterRegione.innerHTML = htmlRegione;
 
-        // Ricostruisci menu Azienda
+        // Azienda
         let htmlAzienda = '<option value="">Tutte</option>';
-        const sortedAziende = Array.from(aziendeSet).sort((a,b) => a.localeCompare(b, 'it'));
-        for (let az of sortedAziende) {
+        [...aziendeSet].sort((a,b) => a.localeCompare(b, 'it')).forEach(az => {
             htmlAzienda += `<option value="${escapeHtml(az)}" ${currentAzienda === az ? 'selected' : ''}>${escapeHtml(az)}</option>`;
-        }
+        });
         filterAzienda.innerHTML = htmlAzienda;
 
-        // Ricostruisci menu Tipo Vino
+        // Tipo vino
         let htmlTipo = '<option value="">Tutti</option>';
-        const sortedTipi = Array.from(tipiSet).sort();
-        for (let t of sortedTipi) {
+        [...tipiSet].sort().forEach(t => {
             htmlTipo += `<option value="${escapeHtml(t)}" ${currentTipo === t ? 'selected' : ''}>${escapeHtml(t)}</option>`;
-        }
+        });
         filterTipo.innerHTML = htmlTipo;
 
-        // Ricostruisci menu Formato
+        // Formato
         let htmlFormato = '<option value="">Tutti</option>';
-        const sortedFormati = Array.from(formatiSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
-        for (let f of sortedFormati) {
+        [...formatiSet].sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(f => {
             htmlFormato += `<option value="${escapeHtml(f)}" ${currentFormato === f ? 'selected' : ''}>${escapeHtml(f)}</option>`;
-        }
+        });
         filterFormato.innerHTML = htmlFormato;
 
         isUpdatingDropdowns = false;
     }
 
-    // ===== FUNZIONE PRINCIPALE APPLICA FILTRI (RICHIAMATA OGNI VOLTA) =====
     function applyFilters() {
         if (!prodotti.length) {
             filteredIndices = [];
@@ -514,15 +505,10 @@
             if (ok) newFiltered.push(i);
         }
         filteredIndices = newFiltered;
-
-        // DOPO aver calcolato i nuovi filtrati, aggiorna i dropdown in modo che mostrino solo i valori presenti tra questi
         refreshDropdownsFromFilteredIndices();
-
-        // Ridisegna la tabella
         renderTable();
     }
 
-    // Nuovo ordine colonne: Checkbox, Cantina, Tipo, Descrizione, Formato, Q.xC, €/bottiglia, €/cartone, CODICE (ultimo)
     function renderTable() {
         if (!prodotti.length) {
             tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center">📭 Nessun prodotto caricato.</td></tr>';
@@ -537,33 +523,29 @@
             const row = document.createElement('tr');
             if (isSelected) row.classList.add('selected-row');
 
-            // 1. Colonna checkbox
             const tdChk = document.createElement('td');
             tdChk.classList.add('checkbox-col');
             const chk = document.createElement('input');
             chk.type = 'checkbox';
             chk.checked = isSelected;
-            chk.addEventListener('change', (function(globalIdx) {
+            chk.addEventListener('change', (function(i) {
                 return function(e) {
-                    if (e.target.checked) selectedIndices.add(globalIdx);
-                    else selectedIndices.delete(globalIdx);
+                    if (e.target.checked) selectedIndices.add(i);
+                    else selectedIndices.delete(i);
                     renderTable();
                 };
             })(idx));
             tdChk.appendChild(chk);
             row.appendChild(tdChk);
 
-            // 2. Cantina
             const tdCantina = document.createElement('td');
             tdCantina.textContent = p.cantinaShort || '';
             row.appendChild(tdCantina);
 
-            // 3. Tipo Vino
             const tdTipo = document.createElement('td');
             tdTipo.textContent = p.tipoVino || '';
             row.appendChild(tdTipo);
 
-            // 4. Descrizione prodotto
             const tdDesc = document.createElement('td');
             const descText = p.descrizione || '';
             if (p.link && p.link.trim() !== '' && p.link !== '#') {
@@ -579,42 +561,34 @@
             }
             row.appendChild(tdDesc);
 
-            // 5. Formato
             const tdForm = document.createElement('td');
             tdForm.innerHTML = `<span class="badge-formato">${escapeHtml(p.formato || '')}</span>`;
             row.appendChild(tdForm);
 
-            // 6. Q.xC
             const tdQxc = document.createElement('td');
             tdQxc.textContent = p.qxc !== null && p.qxc !== undefined ? p.qxc : '';
             row.appendChild(tdQxc);
 
-            // 7. €/bottiglia
             const tdPrezzo = document.createElement('td');
             tdPrezzo.className = 'price-highlight';
             tdPrezzo.textContent = (p.prezzoBottiglia !== null && !isNaN(p.prezzoBottiglia)) ? `€ ${p.prezzoBottiglia.toFixed(2)}` : '-';
             row.appendChild(tdPrezzo);
 
-            // 8. €/cartone
             const tdCartone = document.createElement('td');
             tdCartone.textContent = (p.prezzoCartone !== null && !isNaN(p.prezzoCartone)) ? `€ ${p.prezzoCartone.toFixed(2)}` : '-';
             row.appendChild(tdCartone);
 
-            // 9. CODICE (ultima colonna a destra)
             const tdCod = document.createElement('td');
             tdCod.textContent = p.codArt || '';
             row.appendChild(tdCod);
 
             fragment.appendChild(row);
         }
-
         tableBody.innerHTML = '';
         tableBody.appendChild(fragment);
         const totaleFiltrati = filteredIndices.length;
         let selezionatiFiltrati = 0;
-        for (let idx of selectedIndices) {
-            if (filteredIndices.includes(idx)) selezionatiFiltrati++;
-        }
+        for (let idx of selectedIndices) if (filteredIndices.includes(idx)) selezionatiFiltrati++;
         statsSpan.innerHTML = `🍇 ${totaleFiltrati} prodotti visualizzati — 🗸 selezionati: ${selezionatiFiltrati} (totale caricati: ${prodotti.length})`;
     }
 
@@ -636,12 +610,10 @@
         filterTipo.value = "";
         filterFormato.value = "";
         searchInput.value = "";
-        // Ora applica i filtri (con dropdown vuoti ricalcolati automaticamente)
         applyFilters();
         showMessage("Filtri azzerati");
     }
 
-    // ===== FORMATO WHATSAPP (solo codice + descrizione, tabulati) =====
     function getSelectedTextForWhatsApp() {
         if (selectedIndices.size === 0) {
             alert("⚠️ Nessun prodotto selezionato. Seleziona almeno un vino.");
@@ -667,8 +639,9 @@
         showMessage(`📲 Aperto WhatsApp - invia il messaggio precompilato`);
     }
 
-    // ---------- PARSING EXCEL (IDENTICO ALL'ORIGINALE, MA CON PRESERVAZIONE DELLA LOGICA) ----------
+    // ---------- PARSER EXCEL CORRETTO (gestisce regioni anche nella riga del prodotto) ----------
     function parseExcelRows(rows) {
+        // Trova l'intestazione "Regione/Nazione"
         let headerIndex = -1;
         for (let i = 0; i < Math.min(rows.length, 40); i++) {
             const firstCell = rows[i] && rows[i][0] ? rows[i][0].toString().trim() : "";
@@ -690,16 +663,22 @@
             link: 8
         };
 
-        let currentRegione = "";
-        let currentAziendaFull = "";
-
-        const regioniConosciute = new Set([
+        // Lista completa delle regioni/nazioni
+        const regioniValide = new Set([
             "PIEMONTE", "LOMBARDIA", "TRENTINO ALTO ADIGE", "VENETO", "FRIULI VENEZIA GIULIA",
             "EMILIA ROMAGNA", "TOSCANA", "MARCHE", "UMBRIA", "LAZIO", "ABRUZZO", "MOLISE",
             "CAMPANIA", "PUGLIA", "BASILICATA", "CALABRIA", "SICILIA", "SARDEGNA", "LIGURIA",
-            "FRANCIA", "SPAGNA", "GERMANIA", "AUSTRIA", "SLOVENIA", "USA", "ARGENTINA"
+            "FRANCIA", "SPAGNA", "GERMANIA", "AUSTRIA", "SLOVENIA", "USA", "ARGENTINA", "ITALIA"
         ]);
 
+        const ignoreForAzienda = new Set([
+            "GRANDI FORMATI", "PICCOLI FORMATI", "CONFEZIONI SPECIALI", "CONFEZIONE SPECIALI",
+            "PRODOTTI CHEAP", "LINEA GEOPHORA", "PRODOTTI DI SERVIZIO", "CONFEZIONI SPECIALI",
+            "PRODOTTI CHEAP", "LINEA GEOPHORA", "PRODOTTI DI SERVIZIO", "GRANDI FORMATI", "PICCOLI FORMATI"
+        ]);
+
+        let currentRegione = "";
+        let currentAziendaFull = "";
         const prodottiTemp = [];
 
         for (let i = headerIndex + 1; i < rows.length; i++) {
@@ -709,85 +688,90 @@
             const firstCol = (row[colIdx.regione] !== undefined) ? row[colIdx.regione].toString().trim() : "";
             const codice = (row[colIdx.codArt] !== undefined && row[colIdx.codArt] !== "") ? row[colIdx.codArt].toString().trim() : "";
 
-            if (codice === "") {
-                if (firstCol !== "") {
-                    if (regioniConosciute.has(firstCol.toUpperCase())) {
-                        currentRegione = firstCol;
-                    }
-                    if (firstCol.includes(" - ") || /[A-Z]{2,}\s*-\s*[A-Z]/i.test(firstCol) || 
-                        /(WUNDERGLASS|COLOMBO|FREGONESE|BOVIO|CASCINA|TERRA|AUDARYA|DRAPPIER|DURIN|BELLEI|SPINELLI|VALLONE)/i.test(firstCol)) {
-                        currentAziendaFull = firstCol;
-                    }
+            // RIGA PRODOTTO (con codice articolo)
+            if (codice !== "") {
+                // *** IMPORTANTE: anche nelle righe prodotto, la prima colonna potrebbe contenere una regione ***
+                if (firstCol !== "" && regioniValide.has(firstCol.toUpperCase())) {
+                    currentRegione = firstCol;
                 }
+                // Se la prima colonna contiene un'azienda (es. "WUNDERGLASS" senza trattino ma in maiuscolo) possiamo aggiornarla
+                else if (firstCol !== "" && !ignoreForAzienda.has(firstCol.toUpperCase()) && firstCol.length > 2) {
+                    // Aggiorna l'azienda solo se non è una regione e non è una sezione da ignorare
+                    currentAziendaFull = firstCol;
+                }
+
+                // Determina il tipo vino
+                let tipoRaw = (row[colIdx.tipoVinoRaw] !== undefined) ? row[colIdx.tipoVinoRaw].toString().trim() : "";
+                let tipoVino = "";
+                if (tipoRaw) {
+                    const upper = tipoRaw.toUpperCase();
+                    if (upper.includes("BIANCO") || upper === "BIANCO") tipoVino = "Bianco";
+                    else if (upper.includes("ROSSO") || upper === "ROSSO") tipoVino = "Rosso";
+                    else if (upper.includes("SPUMANTE") || upper === "SPUMANTE") tipoVino = "Spumante";
+                    else if (upper.includes("ROSATO") || upper === "ROSATO" || upper === "ROSE'") tipoVino = "Rosato";
+                    else if (upper.includes("DOLCE") || upper === "DOLCE") tipoVino = "Dolce";
+                    else if (tipoRaw === "●") tipoVino = "Special/Set";
+                    else tipoVino = tipoRaw;
+                }
+
+                let descrizione = (row[colIdx.descrizione] !== undefined) ? row[colIdx.descrizione].toString().trim() : "";
+                let formato = (row[colIdx.formato] !== undefined) ? row[colIdx.formato].toString().trim() : "";
+                let qxcRaw = (row[colIdx.qxc] !== undefined && row[colIdx.qxc] !== "") ? row[colIdx.qxc] : "";
+                let prezzoRaw = (row[colIdx.prezzo] !== undefined && row[colIdx.prezzo] !== "") ? row[colIdx.prezzo] : "";
+                let link = (row[colIdx.link] !== undefined) ? row[colIdx.link].toString().trim() : "";
+
+                let qxcNum = null;
+                let prezzoNum = null;
+                if (qxcRaw !== "") {
+                    const parsedQ = parseFloat(qxcRaw.toString().replace(',', '.'));
+                    if (!isNaN(parsedQ)) qxcNum = parsedQ;
+                }
+                if (prezzoRaw !== "") {
+                    const parsedP = parseFloat(prezzoRaw.toString().replace(',', '.'));
+                    if (!isNaN(parsedP)) prezzoNum = parsedP;
+                }
+                let prezzoCartone = (qxcNum !== null && prezzoNum !== null) ? qxcNum * prezzoNum : null;
+
+                let aziendaFull = currentAziendaFull;
+                if (!aziendaFull) aziendaFull = "Cantina non specificata";
+
+                prodottiTemp.push({
+                    regione: currentRegione,
+                    aziendaFull: aziendaFull,
+                    cantinaShort: extractShortCantina(aziendaFull),
+                    codArt: codice,
+                    tipoVino: tipoVino,
+                    descrizione: descrizione,
+                    formato: formato,
+                    qxc: qxcNum,
+                    prezzoBottiglia: prezzoNum,
+                    prezzoCartone: prezzoCartone,
+                    link: link
+                });
                 continue;
             }
 
-            const tipoRaw = (row[colIdx.tipoVinoRaw] !== undefined) ? row[colIdx.tipoVinoRaw].toString().trim() : "";
-            let tipoVino = "";
-            if (tipoRaw) {
-                const upper = tipoRaw.toUpperCase();
-                if (upper.includes("BIANCO") || upper === "BIANCO") tipoVino = "Bianco";
-                else if (upper.includes("ROSSO") || upper === "ROSSO") tipoVino = "Rosso";
-                else if (upper.includes("SPUMANTE") || upper === "SPUMANTE") tipoVino = "Spumante";
-                else if (upper.includes("ROSATO") || upper === "ROSATO" || upper === "ROSE'") tipoVino = "Rosato";
-                else if (upper.includes("DOLCE") || upper === "DOLCE") tipoVino = "Dolce";
-                else if (tipoRaw === "●") tipoVino = "Special/Set";
-                else tipoVino = tipoRaw;
+            // RIGA SENZA CODICE: aggiorna regione o azienda
+            if (firstCol === "") continue;
+
+            const upperFirst = firstCol.toUpperCase();
+            // È una regione valida?
+            if (regioniValide.has(upperFirst)) {
+                currentRegione = firstCol;
+                continue;
             }
-
-            let descrizione = (row[colIdx.descrizione] !== undefined) ? row[colIdx.descrizione].toString().trim() : "";
-            let formato = (row[colIdx.formato] !== undefined) ? row[colIdx.formato].toString().trim() : "";
-            let qxcRaw = (row[colIdx.qxc] !== undefined && row[colIdx.qxc] !== "") ? row[colIdx.qxc] : "";
-            let prezzoRaw = (row[colIdx.prezzo] !== undefined && row[colIdx.prezzo] !== "") ? row[colIdx.prezzo] : "";
-            let link = (row[colIdx.link] !== undefined) ? row[colIdx.link].toString().trim() : "";
-
-            let qxcNum = null;
-            let prezzoNum = null;
-            if (qxcRaw !== "") {
-                const parsedQ = parseFloat(qxcRaw.toString().replace(',', '.'));
-                if (!isNaN(parsedQ)) qxcNum = parsedQ;
+            // È una sezione da ignorare?
+            if (ignoreForAzienda.has(upperFirst)) {
+                continue;
             }
-            if (prezzoRaw !== "") {
-                const parsedP = parseFloat(prezzoRaw.toString().replace(',', '.'));
-                if (!isNaN(parsedP)) prezzoNum = parsedP;
+            // Altrimenti, probabilmente è un'azienda
+            if (firstCol.length >= 3) {
+                currentAziendaFull = firstCol;
             }
-            let prezzoCartone = (qxcNum !== null && prezzoNum !== null) ? qxcNum * prezzoNum : null;
-
-            let aziendaFull = currentAziendaFull;
-            if (!aziendaFull && firstCol && !regioniConosciute.has(firstCol.toUpperCase())) {
-                aziendaFull = firstCol;
-            }
-            if (!aziendaFull) aziendaFull = "Cantina non specificata";
-
-            const regioneProdotto = currentRegione || (firstCol && regioniConosciute.has(firstCol.toUpperCase()) ? firstCol : "");
-
-            prodottiTemp.push({
-                regione: regioneProdotto,
-                aziendaFull: aziendaFull,
-                cantinaShort: extractShortCantina(aziendaFull),
-                codArt: codice,
-                tipoVino: tipoVino,
-                descrizione: descrizione,
-                formato: formato,
-                qxc: qxcNum,
-                prezzoBottiglia: prezzoNum,
-                prezzoCartone: prezzoCartone,
-                link: link
-            });
         }
 
         if (prodottiTemp.length === 0) throw new Error("Nessun prodotto valido trovato");
-        prodotti = prodottiTemp;
-        selectedIndices.clear();
-        
-        // Inizializza filteredIndices con tutti i prodotti
-        filteredIndices = prodotti.map((_, idx) => idx);
-        // Aggiorna i dropdown in base a tutti i prodotti (stato iniziale)
-        refreshDropdownsFromFilteredIndices();
-        renderTable();
-        showMessage(`✅ Caricati ${prodotti.length} vini. Clicca sul nome per il PDF/link.`);
-        statsSpan.innerText = `📂 Caricati ${prodotti.length} vini — usa i filtri per esplorare`;
-        manualUploadZone.style.display = 'none';
+        return prodottiTemp;
     }
 
     function handleManualFile(file) {
@@ -798,7 +782,15 @@
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
             try {
-                parseExcelRows(rows);
+                const prodottiTemp = parseExcelRows(rows);
+                prodotti = prodottiTemp;
+                selectedIndices.clear();
+                filteredIndices = prodotti.map((_, idx) => idx);
+                refreshDropdownsFromFilteredIndices();
+                renderTable();
+                showMessage(`✅ Caricati ${prodotti.length} vini. Clicca sul nome per il PDF/link.`);
+                statsSpan.innerText = `📂 Caricati ${prodotti.length} vini — usa i filtri per esplorare`;
+                manualUploadZone.style.display = 'none';
             } catch (err) {
                 alert("Errore nel parsing del file: " + err.message);
             }
@@ -826,7 +818,15 @@
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
             if (!rows || rows.length < 2) throw new Error("File vuoto");
-            parseExcelRows(rows);
+            const prodottiTemp = parseExcelRows(rows);
+            prodotti = prodottiTemp;
+            selectedIndices.clear();
+            filteredIndices = prodotti.map((_, idx) => idx);
+            refreshDropdownsFromFilteredIndices();
+            renderTable();
+            showMessage(`✅ Caricati ${prodotti.length} vini. Clicca sul nome per il PDF/link.`);
+            statsSpan.innerText = `📂 Caricati ${prodotti.length} vini — usa i filtri per esplorare`;
+            manualUploadZone.style.display = 'none';
         } catch (err) {
             console.error(err);
             statsSpan.innerText = "❌ File automatico non trovato";
@@ -836,7 +836,7 @@
         }
     }
 
-    // Event listeners (NOTA: Non serve più chiamare refreshFilterOptions esternamente, perché applyFilters già aggiorna i dropdown)
+    // Event listeners
     filterRegione.addEventListener('change', () => applyFilters());
     filterAzienda.addEventListener('change', () => applyFilters());
     filterTipo.addEventListener('change', () => applyFilters());
