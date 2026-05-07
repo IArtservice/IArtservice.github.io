@@ -206,10 +206,17 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 6px;
-            /* Aumentata la visibilità del sottotitolo */
-            color: #e0c28e;
+            /* Sottotitolo ottimizzato per massima leggibilità su qualsiasi sfondo */
+            color: #f0d48a;                     /* leggermente più luminoso */
             margin-top: 8px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 255, 240, 0.7);
+            /* Ombre multiple per creare un contorno scuro deciso */
+            text-shadow:
+                0 0 2px rgba(0, 0, 0, 0.9),
+                0 0 6px rgba(0, 0, 0, 0.7),
+                0 2px 4px rgba(0, 0, 0, 0.8);
+            /* Sottilissimo bordo nero (0.3px) per definire le lettere */
+            -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.7);
+            text-stroke: 0.3px rgba(0, 0, 0, 0.7); /* proprietà standard (non ancora ampiamente supportata, ma progressiva) */
         }
 
         .filter-bar {
