@@ -12,13 +12,13 @@
         }
         html {
             scroll-behavior: smooth;
-            background-color: #2c1e14; /* ← NUOVO: evita barra bianca durante overscroll */
         }
         body {
             font-family: Georgia, 'Times New Roman', Times, serif;
             color: #1f1a14;
             overflow-x: hidden;
-            background-color: #2c1e14; /* ← MODIFICATO da #f8f5f0 per evitare barra bianca */
+            /* Sostituito il colore di sfondo chiaro con il marrone scuro per eliminare la barra bianca */
+            background-color: #2c1e14;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -56,7 +56,6 @@
             opacity: 0;
             transition: opacity 0.6s ease;
         }
-        /* BLUR SU SFONDO (invariato) */
         #bgLayer::before,
         #bgLayerNext::before {
             content: "";
@@ -207,9 +206,10 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 6px;
-            color: #c0b090;
+            /* Aumentata la visibilità del sottotitolo */
+            color: #e0c28e;
             margin-top: 8px;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 4px rgba(255, 255, 240, 0.5);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 255, 240, 0.7);
         }
 
         .filter-bar {
@@ -255,13 +255,11 @@
             transition: transform 0.08s ease;
         }
 
-        /* PANNELLO CENTRALE – OTTIMIZZATO: nessun backdrop-filter, opacità aumentata */
         .dynamic-bg {
-            background-color: rgba(255, 250, 242, 0.8);   /* era 0.65 */
+            background-color: rgba(255, 250, 242, 0.8);
             border-radius: 24px;
             margin: 15px 0 30px;
             box-shadow: 0 15px 30px -12px rgba(0, 0, 0, 0.2);
-            /* backdrop-filter: blur(2px);  RIMOSSO per fluidità */
             position: relative;
             z-index: 1;
             min-height: 400px;
@@ -382,11 +380,12 @@
             margin-top: 50px;
             text-align: center;
             font-size: 0.7rem;
-            color: #5a4a3a;
+            /* Footer più leggibile: colore scuro e nessuna ombra sfocata */
+            color: #2b241b;
             border-top: 1px solid rgba(180, 140, 90, 0.5);
             padding-top: 30px;
             letter-spacing: 0.4px;
-            text-shadow: 0 1px 3px rgba(255, 255, 240, 0.9), 0 0 4px rgba(0, 0, 0, 0.3);
+            text-shadow: none;
         }
 
         .credit {
