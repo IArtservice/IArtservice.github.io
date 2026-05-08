@@ -155,14 +155,14 @@
       ] }
   ];
 
-  // Aggiungo "Non mi interessa" a tutte le categorie
+  // Aggiungo "Non mi interessa"
   for (let cat of CATEGORIES) {
     cat.options.push({ name: "Non mi interessa / Nessuno di questi", price: 0, perPerson: false });
   }
 
   const TOTAL = CATEGORIES.length;
   let selections = Array(TOTAL).fill().map(() => ({ optIndex: null, participants: null }));
-  let currentStep = -1; // -1 = contatti, 0..TOTAL-1 = categorie, TOTAL = riepilogo
+  let currentStep = -1;
   let userContact = { name: "", email: "", phone: "" };
 
   const dynamicDiv = document.getElementById('dynamicStep');
@@ -171,7 +171,6 @@
   const stepLabelSpan = document.getElementById('stepLabel');
   const totalPreviewSpan = document.getElementById('totalPreview');
 
-  // --- FUNZIONI ORIGINALI ---
   function computeTotal() {
     let total = 0;
     for (let i = 0; i < TOTAL; i++) {
@@ -433,7 +432,7 @@
     document.getElementById('resetAllBtn')?.addEventListener('click', () => {
       if (confirm('Cancellare tutte le selezioni e ricominciare?')) {
         selections = Array(TOTAL).fill().map(() => ({ optIndex: null, participants: null }));
-        currentStep = -1; // Ricomincia dal form contatti
+        currentStep = -1;
         renderCurrentStep();
       }
     });
@@ -537,19 +536,31 @@
   }
 
   function setupContactEvents() {
+    // Assicuriamoci che il pulsante esista prima di attaccare l'evento
     const btn = document.getElementById('startPreventivoBtn');
-    const err = document.getElementById('contactError');
+    if (!btn) {
+      console.error("❌ Pulsante startPreventivoBtn non trovato!");
+      return;
+    }
+    console.log("✅ Pulsante trovato, attacco evento click");
+    
     btn.addEventListener('click', () => {
+      console.log("🖱️ Click su Inizia il tuo preventivo");
+      
       const name = document.getElementById('c_name').value.trim();
       const email = document.getElementById('c_email').value.trim();
       const phone = document.getElementById('c_phone').value.trim();
+      const err = document.getElementById('contactError');
 
       if (!name || !email) {
-        err.style.display = 'block';
+        if (err) err.style.display = 'block';
+        console.warn("⚠️ Nome o email mancanti");
         return;
       }
 
       userContact = { name, email, phone };
+      console.log("✅ Dati raccolti:", userContact);
+      
       submitContactToGoogle();   // INVIA SUBITO I DATI
 
       currentStep = 0; // Passa alla prima categoria
@@ -562,6 +573,7 @@
     if (currentStep === -1) {
       // Form contatti
       dynamicDiv.innerHTML = renderContactForm();
+      // Imposta l'evento DOPO che il contenuto è stato inserito
       setupContactEvents();
       navDiv.innerHTML = '';
       progressFill.style.width = '0%';
@@ -578,7 +590,6 @@
       attachSendEvents();
       updateProgress();
       
-      // Pre-compila il nome con quello già inserito
       const nameInput = document.getElementById('clientName');
       if (nameInput && userContact.name) {
         nameInput.value = userContact.name;
@@ -604,7 +615,7 @@
 
   function init() {
     selections = Array(TOTAL).fill().map(() => ({ optIndex: null, participants: null }));
-    currentStep = -1; // Parti sempre dal form contatti
+    currentStep = -1;
     renderCurrentStep();
   }
   init();
