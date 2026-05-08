@@ -88,8 +88,8 @@
 </div>
 
 <script>
-  // === GOOGLE APPS SCRIPT WEB APP URL (NUOVO) ===
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwWGwqFyMLcp_j0ffA0icQ93rtjiDtObAwBuDsdqArHel_gw51K1DQfXaA4uKE6omU/exec";
+  // === NUOVO GOOGLE APPS SCRIPT WEB APP URL (GmailApp) ===
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyQbvBPXmmaaosr70qBkdEUsJKyKYZ0JU7AbL6JbSuq77jtaezBy_l7oL-oSIHBXIc/exec";
 
   // === CATEGORIE DEFINITIVE ===
   const CATEGORIES = [
@@ -155,14 +155,14 @@
       ] }
   ];
 
-  // Aggiungo "Non mi interessa"
+  // Aggiungo "Non mi interessa" a tutte le categorie
   for (let cat of CATEGORIES) {
     cat.options.push({ name: "Non mi interessa / Nessuno di questi", price: 0, perPerson: false });
   }
 
   const TOTAL = CATEGORIES.length;
   let selections = Array(TOTAL).fill().map(() => ({ optIndex: null, participants: null }));
-  let currentStep = -1;
+  let currentStep = -1; // -1 = contatti, 0..TOTAL-1 = categorie, TOTAL = riepilogo
   let userContact = { name: "", email: "", phone: "" };
 
   const dynamicDiv = document.getElementById('dynamicStep');
@@ -171,6 +171,7 @@
   const stepLabelSpan = document.getElementById('stepLabel');
   const totalPreviewSpan = document.getElementById('totalPreview');
 
+  // --- FUNZIONI ORIGINALI ---
   function computeTotal() {
     let total = 0;
     for (let i = 0; i < TOTAL; i++) {
@@ -432,7 +433,7 @@
     document.getElementById('resetAllBtn')?.addEventListener('click', () => {
       if (confirm('Cancellare tutte le selezioni e ricominciare?')) {
         selections = Array(TOTAL).fill().map(() => ({ optIndex: null, participants: null }));
-        currentStep = -1;
+        currentStep = -1; // Ricomincia dal form contatti
         renderCurrentStep();
       }
     });
@@ -527,7 +528,7 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        console.log("✅ Contatto inviato con successo! Email dovrebbe arrivare.");
+        console.log("✅ Contatto inviato con successo! L'email è stata spedita.");
       } else {
         console.error("❌ Errore dal server:", data.error);
       }
@@ -551,13 +552,15 @@
       userContact = { name, email, phone };
       submitContactToGoogle();   // INVIA SUBITO I DATI
 
-      currentStep = 0;
+      currentStep = 0; // Passa alla prima categoria
       renderCurrentStep();
     });
   }
 
+  // === LOGICA PRINCIPALE ===
   function renderCurrentStep() {
     if (currentStep === -1) {
+      // Form contatti
       dynamicDiv.innerHTML = renderContactForm();
       setupContactEvents();
       navDiv.innerHTML = '';
@@ -575,6 +578,7 @@
       attachSendEvents();
       updateProgress();
       
+      // Pre-compila il nome con quello già inserito
       const nameInput = document.getElementById('clientName');
       if (nameInput && userContact.name) {
         nameInput.value = userContact.name;
@@ -600,7 +604,7 @@
 
   function init() {
     selections = Array(TOTAL).fill().map(() => ({ optIndex: null, participants: null }));
-    currentStep = -1;
+    currentStep = -1; // Parti sempre dal form contatti
     renderCurrentStep();
   }
   init();
