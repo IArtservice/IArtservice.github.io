@@ -89,8 +89,8 @@
 </div>
 
 <script>
-  // === NUOVO URL AGGIORNATO ===
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6jDLcO0Lx8MaI3fmMct55KJGdLUqyXHr78EBCZXPLlQXnAV3k10F6UB1EpUCqRkM/exec";
+  // === NUOVO URL FORNITO DALL'UTENTE ===
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzuyMdipxcQXTHpvXiJMexJlq94hXggE2nyyX8C-gphP8dBwrf_wbZjwHXWb6tmEI4/exec";
 
   // === CATEGORIE DEFINITIVE ===
   const CATEGORIES = [
@@ -495,7 +495,7 @@ const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6jDLcO0Lx8MaI3fmMc
     };
   }
 
-  // ========== FORM CONTATTI INIZIALE ==========
+  // ========== FORM CONTATTI INIZIALE CON FETCH CORRETTA ==========
   function renderContactForm() {
     return `
       <div class="category-title">Prima di iniziare</div>
@@ -511,7 +511,7 @@ const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6jDLcO0Lx8MaI3fmMc
     `;
   }
 
-  // Funzione anti‑CORS per invio a Google Apps Script
+  // Invio corretto con CORS e gestione risposta
   function submitContactToGoogle() {
     const statusDiv = document.getElementById('statusMsg');
     if (statusDiv) statusDiv.innerText = "Invio dei tuoi dati in corso...";
@@ -524,17 +524,24 @@ const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6jDLcO0Lx8MaI3fmMc
 
     fetch(WEBAPP_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
+      mode: 'cors',                       // fondamentale per leggere la risposta
+      headers: { 
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(payload)
     })
-    .then(() => {
-      if (statusDiv) statusDiv.innerText = "✅ Dati inviati! Grazie.";
-      console.log("✅ Richiesta inviata con successo.");
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.success) {
+        if (statusDiv) statusDiv.innerText = "✅ Dati inviati! Grazie.";
+        console.log("✅ Invio riuscito:", data);
+      } else {
+        throw new Error(data?.error || "Errore sconosciuto dal server");
+      }
     })
     .catch(err => {
-      if (statusDiv) statusDiv.innerText = "❌ Errore durante l'invio. Riprova.";
-      console.error("❌ Errore nella fetch:", err);
+      console.error("❌ Errore fetch:", err);
+      if (statusDiv) statusDiv.innerText = "❌ Errore di connessione. Riprova più tardi.";
     });
   }
 
@@ -551,9 +558,10 @@ const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6jDLcO0Lx8MaI3fmMc
         if (err) err.style.display = 'block';
         return;
       }
+      if (err) err.style.display = 'none';
 
       userContact = { name, email, phone };
-      submitContactToGoogle();   // invio senza attendere risposta
+      submitContactToGoogle();   // invio asincrono – non blocca il passaggio
       currentStep = 0;          // passa alla prima categoria
       renderCurrentStep();
     });
