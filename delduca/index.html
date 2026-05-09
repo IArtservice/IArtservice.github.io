@@ -89,8 +89,8 @@
 </div>
 
 <script>
-  // === NUOVO URL FORNITO DALL'UTENTE ===
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzuyMdipxcQXTHpvXiJMexJlq94hXggE2nyyX8C-gphP8dBwrf_wbZjwHXWb6tmEI4/exec";
+  // === URL DEL WEB APP AGGIORNATO ===
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw1bJBJS-wSX3Qg5I7FrKbiUp3AuWfkDioBJYB7ANFcaI1h2nGgxL-QZUpedOzttM0/exec";
 
   // === CATEGORIE DEFINITIVE ===
   const CATEGORIES = [
@@ -495,7 +495,7 @@
     };
   }
 
-  // ========== FORM CONTATTI INIZIALE CON FETCH CORRETTA ==========
+  // ========== FORM CONTATTI INIZIALE CON FETCH CORRETTA (no-cors) ==========
   function renderContactForm() {
     return `
       <div class="category-title">Prima di iniziare</div>
@@ -511,7 +511,7 @@
     `;
   }
 
-  // Invio corretto con CORS e gestione risposta
+  // Invio con modalità no-cors (nessun problema CORS)
   function submitContactToGoogle() {
     const statusDiv = document.getElementById('statusMsg');
     if (statusDiv) statusDiv.innerText = "Invio dei tuoi dati in corso...";
@@ -524,24 +524,20 @@
 
     fetch(WEBAPP_URL, {
       method: 'POST',
-      mode: 'cors',                       // fondamentale per leggere la risposta
+      mode: 'no-cors',                       // Evita preflight CORS
       headers: { 
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/plain'
       },
       body: JSON.stringify(payload)
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data && data.success) {
-        if (statusDiv) statusDiv.innerText = "✅ Dati inviati! Grazie.";
-        console.log("✅ Invio riuscito:", data);
-      } else {
-        throw new Error(data?.error || "Errore sconosciuto dal server");
-      }
+    .then(() => {
+      // Con no-cors non possiamo leggere la risposta, ma la richiesta è stata inviata
+      if (statusDiv) statusDiv.innerText = "✅ Dati inviati! Grazie.";
+      console.log("✅ Richiesta inviata con no-cors.");
     })
     .catch(err => {
       console.error("❌ Errore fetch:", err);
-      if (statusDiv) statusDiv.innerText = "❌ Errore di connessione. Riprova più tardi.";
+      if (statusDiv) statusDiv.innerText = "❌ Impossibile contattare il server. Riprova più tardi.";
     });
   }
 
@@ -562,7 +558,7 @@
 
       userContact = { name, email, phone };
       submitContactToGoogle();   // invio asincrono – non blocca il passaggio
-      currentStep = 0;          // passa alla prima categoria
+      currentStep = 0;
       renderCurrentStep();
     });
   }
