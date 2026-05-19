@@ -2,16 +2,54 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Promozioni del Mese</title>
-    <meta http-equiv="refresh" content="0; URL='volantino.pdf'">
-</head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-    <h2>Apertura promozioni...</h2>
-    <p>Se non visualizzi il file, <a href="volantino.pdf">clicca qui per aprirlo</a>.</p>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Paracadute: se JS è disabilitato, reindirizza dopo 1 secondo -->
+    <meta http-equiv="refresh" content="1; url=https://IArtservice.github.io/partesa/">
+    <title>Menu in caricamento...</title>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            text-align: center;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+    
     <script>
-        // Aggiunge un numero univoco basato sull'orario per forzare il download del nuovo file
-        window.location.href = "volantino.pdf?v=" + Date.now();
+        // Reindirizzamento immediato al nuovo repository dedicato
+        window.location.href = "https://IArtservice.github.io/partesa/";
     </script>
+</head>
+<body>
+
+    <div class="loader"></div>
+    <p>Ti stiamo trasferendo al menu...</p>
+    <p>Se la pagina non si carica, <a href="https://IArtservice.github.io/partesa/">clicca qui</a>.</p>
+
 </body>
 </html>
